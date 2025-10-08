@@ -186,7 +186,7 @@ function initializeClock(svg, settings) {
   function drawClockHands() {
     const now = getCurrentTime();
     const angles = calculateClockAngles(now);
-    
+
     // Remove previous hands
     Array.from(svg.querySelectorAll('.clock-hand')).forEach(hand => hand.remove());
 
@@ -224,7 +224,7 @@ function initializeClock(svg, settings) {
     const minutes = now.getMinutes();
     const minuteFraction = minutes / 60;
     const hours = now.getHours();
-    
+
     return {
       second: (now.getSeconds() / 60) * 2 * Math.PI - Math.PI / 2,
       minute: minuteFraction * 2 * Math.PI - Math.PI / 2,
@@ -243,12 +243,12 @@ function initializeClock(svg, settings) {
 
   function updateDigitalClock() {
     const now = getCurrentTime();
-    
+
     // Get or create SVG text elements
     let timeText = svg.querySelector('.digital-time');
     let dateText = svg.querySelector('.digital-date');
     let dayText = svg.querySelector('.digital-day');
-    
+
     if (!timeText) {
       timeText = createSVGElement('text', {
         x: SVG_CONFIG.center.x,
@@ -262,11 +262,11 @@ function initializeClock(svg, settings) {
       });
       svg.appendChild(timeText);
     }
-    
+
     if (!dateText) {
       dateText = createSVGElement('text', {
         x: SVG_CONFIG.center.x,
-        y: SVG_CONFIG.center.y + 10,
+        y: SVG_CONFIG.center.y + 15,
         'text-anchor': 'middle',
         'dominant-baseline': 'middle',
         'font-size': '16',
@@ -275,11 +275,11 @@ function initializeClock(svg, settings) {
       });
       svg.appendChild(dateText);
     }
-    
+
     if (!dayText) {
       dayText = createSVGElement('text', {
         x: SVG_CONFIG.center.x,
-        y: SVG_CONFIG.center.y + 35,
+        y: SVG_CONFIG.center.y + 55,  // Moved down to make room for month
         'text-anchor': 'middle',
         'dominant-baseline': 'middle',
         'font-size': '14',
@@ -288,7 +288,7 @@ function initializeClock(svg, settings) {
       });
       svg.appendChild(dayText);
     }
-    
+
     // Update the text content
     timeText.textContent = now.toLocaleTimeString(undefined, {
       hour12: false,
@@ -296,26 +296,42 @@ function initializeClock(svg, settings) {
       minute: '2-digit',
       second: '2-digit'
     });
-    
+
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     dateText.textContent = `${year}-${month}-${day}`;
-    
+
     const monthName = now.toLocaleString('en-US', { month: 'long' });
     const weekDay = now.toLocaleString('en-US', { weekday: 'long' });
-    dayText.textContent = `${monthName}, ${weekDay}`;
+    dayText.textContent = `${weekDay}`;  // Only weekday
+
+    // Create or update month text
+    let monthText = svg.querySelector('.digital-month');
+    if (!monthText) {
+      monthText = createSVGElement('text', {
+        x: SVG_CONFIG.center.x,
+        y: SVG_CONFIG.center.y + 35,
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        'font-size': '14',
+        class: 'digital-month',
+        fill: '#333'
+      });
+      svg.appendChild(monthText);
+    }
+    monthText.textContent = monthName;
   }
 
   // Draw diameter lines
   function drawDiameterLines() {
     const offset = CLOCK_RADII.minute;
     const { x, y } = SVG_CONFIG.center;
-    
+
     // Draw the main diameter lines
     ['horizontal', 'vertical', 'diagonal1', 'diagonal2'].forEach(direction => {
       let x1, y1, x2, y2;
-      
+
       if (direction === 'horizontal') {
         [x1, y1, x2, y2] = [x - offset, y, x + offset, y];
       } else if (direction === 'vertical') {
@@ -328,7 +344,7 @@ function initializeClock(svg, settings) {
           [x1, y1, x2, y2] = [x - diagOffset, y + diagOffset, x + diagOffset, y - diagOffset];
         }
       }
-      
+
       const line = createSVGElement('line', {
         x1, y1, x2, y2,
         stroke: 'gray',
@@ -346,12 +362,12 @@ function initializeClock(svg, settings) {
       const angle = (i / 60) * 2 * Math.PI - Math.PI / 2;
       const isHour = i % 5 === 0;
       const length = isHour ? 15 : 10;
-      
+
       const x1 = SVG_CONFIG.center.x + Math.cos(angle) * CLOCK_RADII.minute;
       const y1 = SVG_CONFIG.center.y + Math.sin(angle) * CLOCK_RADII.minute;
       const x2 = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.minute - length);
       const y2 = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.minute - length);
-      
+
       const tick = createSVGElement('line', {
         x1, y1, x2, y2,
         stroke: 'blue',
@@ -382,12 +398,12 @@ function initializeClock(svg, settings) {
       const angle = (i / 24) * 2 * Math.PI - Math.PI / 2;
       const isMainTick = i % 3 === 0;
       const length = isMainTick ? 12 : 8;
-      
+
       const x1 = SVG_CONFIG.center.x + Math.cos(angle) * CLOCK_RADII.hour24;
       const y1 = SVG_CONFIG.center.y + Math.sin(angle) * CLOCK_RADII.hour24;
       const x2 = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - length);
       const y2 = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - length);
-      
+
       const tick = createSVGElement('line', {
         x1, y1, x2, y2,
         stroke: 'red',
@@ -400,12 +416,12 @@ function initializeClock(svg, settings) {
     for (let i = 0; i < 12; i++) {
       const angle = (i / 12) * 2 * Math.PI - Math.PI / 2;
       const length = 10;
-      
+
       const x1 = SVG_CONFIG.center.x + Math.cos(angle) * CLOCK_RADII.hour12;
       const y1 = SVG_CONFIG.center.y + Math.sin(angle) * CLOCK_RADII.hour12;
       const x2 = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour12 - length);
       const y2 = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour12 - length);
-      
+
       const tick = createSVGElement('line', {
         x1, y1, x2, y2,
         stroke: 'green',
@@ -420,7 +436,7 @@ function initializeClock(svg, settings) {
         const angle = (i / 24) * 2 * Math.PI - Math.PI / 2;
         const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - 20);
         const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - 20);
-        
+
         const text = createSVGElement('text', {
           x, y,
           'text-anchor': 'middle',
@@ -439,7 +455,7 @@ function initializeClock(svg, settings) {
       const angle = ((i - 3) / 12) * 2 * Math.PI;
       const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour12 - 25);
       const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour12 - 25);
-      
+
       const text = createSVGElement('text', {
         x, y,
         'text-anchor': 'middle',
@@ -523,19 +539,19 @@ function initializeClock(svg, settings) {
   drawTicks();
   drawCompassDirections();
   drawCenterCircle();
-  
+
   // Start the clocks
   updateDigitalClock();
   drawClockHands();
-  
+
   // Store the interval ID so we can clear it when reinitializing
   window.clockInterval = window.clockInterval || null;
-  
+
   // Clear any existing interval
   if (window.clockInterval) {
     clearInterval(window.clockInterval);
   }
-  
+
   // Start new interval
   window.clockInterval = setInterval(() => {
     updateDigitalClock();

@@ -184,10 +184,11 @@
       const hour12Angle = ((now.getHours() % 12 + now.getMinutes()/60) / 12) * 2 * Math.PI - Math.PI / 2;
       const hour24Angle = ((now.getHours() + now.getMinutes()/60) / 24) * 2 * Math.PI - Math.PI / 2;
       const hands = [
-        createArrow(centerX, centerY, centerX + Math.cos(secAngle) * radius60, centerY + Math.sin(secAngle) * radius60, "purple", 3),
-        createArrow(centerX, centerY, centerX + Math.cos(minAngle) * radius60 * 0.9, centerY + Math.sin(minAngle) * radius60 * 0.9, "blue", 4),
         createArrow(centerX, centerY, centerX + Math.cos(hour12Angle) * radius12, centerY + Math.sin(hour12Angle) * radius12, "green", 5),
-        createArrow(centerX, centerY, centerX + Math.cos(hour24Angle) * radius24, centerY + Math.sin(hour24Angle) * radius24, "red", 5)
+        createArrow(centerX, centerY, centerX + Math.cos(hour24Angle) * radius24, centerY + Math.sin(hour24Angle) * radius24, "red", 5),
+        //createArrow(centerX, centerY, centerX + Math.cos(minAngle) * radius60 * 0.9, centerY + Math.sin(minAngle) * radius60 * 0.9, "blue", 4),
+        createArrow(centerX, centerY, centerX + Math.cos(minAngle) * radius60, centerY + Math.sin(minAngle) * radius60, "blue", 4),
+        createArrow(centerX, centerY, centerX + Math.cos(secAngle) * radius60, centerY + Math.sin(secAngle) * radius60, "purple", 3)
       ];
       return hands.map(render);
     };

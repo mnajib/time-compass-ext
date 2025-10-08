@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Time Compass</title>
+  <style>
+    html,body { margin:0; padding:0; }
+    .container { width: 900px; height: 900px; }
+    svg { width:100%; height:auto; display:block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+<!-- BEGIN Time Compass Combined SVG (copied verbatim) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <script type="application/ecmascript"><![CDATA[
+    // Time Compass Combined - with digital clock and date in center circle
+
+    const svg = document.currentScript.ownerSVGElement;
+    const svgWidth = svg.viewBox.baseVal.width;
+    const svgHeight = svg.viewBox.baseVal.height;
+
+    const centerX = svgWidth / 2;
+    const centerY = svgHeight / 2;
+
+    const radius12 = 280;
+    const radius24 = radius12 + 70;
+    const radius60 = radius24 + 70;
+
+    const radiusCompass = 200;
+    const compassLineDiag = 212;
+    const compassCenterCircle = 60;
+
+    const compassLabelRadius = 160;
+    const compassLabelSpacingArab = 0;
+    const compassLabelSpacingBM = 24;
+    const compassLabelSpacingEN = 46;
+    const compassLabelSpacingDeg = 66;
+
+    const tickLengthMinutes = 10;
+    const tickLength24 = 8;
+    const tickLength12 = 12;
+
+    const tickLabelOffset = 20;
+
+    const createCircle = (cx, cy, r, stroke, strokeWidth, fill="none") => ({
+      el: "circle", attrs: { cx, cy, r, stroke, "stroke-width": strokeWidth, fill }
+    });
+
+    const createLine = (x1, y1, x2, y2, stroke="black", width=1, dash=null) => {
+      const attrs = { x1, y1, x2, y2, stroke, "stroke-width": width };
+      if (dash) attrs["stroke-dasharray"] = dash;
+      return { el: "line", attrs };
+    };
+
+    const createArrow = (x1, y1, x2, y2, stroke="black", width=3) => {
+      return { el: "line", attrs: { x1, y1, x2, y2, stroke, "stroke-width": width, "marker-end": "url(#arrowhead)" } };
+    };
+
+    const createText = (x, y, txt, opts={}) => {
+      const attrs = { x, y, "text-anchor": "middle", "font-size": opts.size||12, fill: opts.color||"black" };
+      if (opts.weight) attrs["font-weight"] = opts.weight;
+      if (opts.style) attrs["font-style"] = opts.style;
+      if (opts.lang === "arab") attrs.direction = "rtl";
+      return { el: "text", attrs, txt };
+    };
+
+    const render = ({el, attrs, txt}) => {
+      const node = document.createElementNS("http://www.w3.org/2000/svg", el);
+      Object.entries(attrs).forEach(([k,v]) => node.setAttribute(k, v));
+      if (txt) node.textContent = txt;
+      svg.appendChild(node);
+      return node;
+    };
+
+    const drawDiameterLines = () => {
+      const offset = radius60;
+      render(createLine(centerX - offset, centerY, centerX + offset, centerY, "gray", 1, "4 2"));
+      render(createLine(centerX, centerY - offset, centerX, centerY + offset, "gray", 1, "4 2"));
+      const diagOffset = offset / Math.sqrt(2);
+      render(createLine(centerX - diagOffset, centerY - diagOffset, centerX + diagOffset, centerY + diagOffset, "gray", 1, "4 2"));
+      render(createLine(centerX - diagOffset, centerY + diagOffset, centerX + diagOffset, centerY - diagOffset, "gray", 1, "4 2"));
+    };
+
+    drawDiameterLines();
+
+    const drawTimeCircles = () => {
+      const timeCircles = [
+        { radius: radius60, color: "blue" },
+        { radius: radius24, color: "red" },
+        { radius: radius12, color: "green" }
+      ];
+      timeCircles.forEach(c => render(createCircle(centerX, centerY, c.radius, c.color, 1)));
+    };
+
+    const addDirection = (angleDeg, arab, bm, en, deg) => {
+      const angle = (angleDeg - 90) * Math.PI/180;
+      const x = centerX + compassLabelRadius * Math.cos(angle);
+      const y = centerY + compassLabelRadius * Math.sin(angle);
+      [
+        createText(x, y+compassLabelSpacingArab, arab, {size:22, lang:"arab"}),
+        createText(x, y+compassLabelSpacingBM, bm, {size:22, weight:"700"}),
+        createText(x, y+compassLabelSpacingEN, en, {size:18, style:"italic"}),
+        createText(x, y+compassLabelSpacingDeg, deg+"°", {size:12})
+      ].forEach(render);
+    };
+
+    [
+      [0, "شَمَال", "Utara", "North", 0],
+      [90, "شَرْق", "Timur", "East", 90],
+      [180, "جَنُوب", "Selatan", "South", 180],
+      [270, "غَرْب", "Barat", "West", 270],
+      [45, "شَمَال شَرْق", "Timur Laut", "Northeast", 45],
+      [135, "جَنُوب شَرْق", "Tenggara", "Southeast", 135],
+      [225, "جَنُوب غَرْب", "Barat Daya", "Southwest", 225],
+      [315, "شَمَال غَرْب", "Barat Laut", "Northwest", 315]
+    ].forEach(args => addDirection(...args));
+
+    render(createCircle(centerX, centerY, compassCenterCircle, "black", 2, "white"));
+
+    // Replace center text with digital time and date display
+    const digitalTime = render(createText(centerX, centerY - 6, "--:--:--", {size:26, weight:"700"}));
+    const digitalDate = render(createText(centerX, centerY + 24, "----/--/--", {size:18, style:"italic"}));
+
+    const updateDigitalClock = () => {
+      //const now = new Date();
+      const nowUTC = new Date();
+      const now = new Date(nowUTC.getTime() + 8 * 60 * 60 * 1000); // Malaysia = UTC+8
+      const timeStr = now.toLocaleTimeString([], {hour12:false});
+      const dateStr = now.toISOString().split('T')[0];
+      digitalTime.textContent = timeStr;
+      digitalDate.textContent = dateStr;
+    };
+    setInterval(updateDigitalClock, 1000);
+    updateDigitalClock();
+
+    drawTimeCircles();
+
+    const addTicks = (count, radius, tickLen, fontSize, labelStep=1, labelMax=null, labelFilter=null, color="black", weight="normal") => {
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * 2 * Math.PI - Math.PI / 2;
+        const x1 = centerX + radius * Math.cos(angle);
+        const y1 = centerY + radius * Math.sin(angle);
+        const x2 = centerX + (radius - tickLen) * Math.cos(angle);
+        const y2 = centerY + (radius - tickLen) * Math.sin(angle);
+        render(createLine(x1,y1,x2,y2,color));
+        if (i % labelStep === 0 && (!labelFilter || labelFilter.includes(i || labelMax))) {
+          const x = centerX + (radius - tickLen - tickLabelOffset) * Math.cos(angle);
+          const y = centerY + (radius - tickLen - tickLabelOffset) * Math.sin(angle);
+          const label = (i === 0 && labelMax) ? labelMax : i;
+          render(createText(x,y,label,{size:fontSize,color,weight}));
+        }
+      }
+    };
+
+    addTicks(60, radius60, tickLengthMinutes, 14, 5, 60, null, "blue", "700");
+    addTicks(24, radius24, tickLength24, 16, 1, 24, [3,6,9,12,15,18,21,24], "red", "700");
+    addTicks(12, radius12, tickLength12, 18, 1, 12, null, "green", "700");
+
+    // Define arrowhead marker
+    const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+    marker.setAttribute("id", "arrowhead");
+    marker.setAttribute("markerWidth", "10");
+    marker.setAttribute("markerHeight", "10");
+    marker.setAttribute("refX", "5");
+    marker.setAttribute("refY", "2.5");
+    marker.setAttribute("orient", "auto-start-reverse");
+    const arrowPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    arrowPath.setAttribute("d", "M0,0 L5,2.5 L0,5 Z");
+    arrowPath.setAttribute("fill", "black");
+    marker.appendChild(arrowPath);
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    defs.appendChild(marker);
+    svg.insertBefore(defs, svg.firstChild);
+
+    const drawClockHands = () => {
+      //const now = new Date();
+      const nowUTC = new Date();
+      const now = new Date(nowUTC.getTime() + 8 * 60 * 60 * 1000); // Malaysia = UTC+8
+      const secAngle = (now.getSeconds() / 60) * 2 * Math.PI - Math.PI / 2;
+      const minAngle = (now.getMinutes() / 60) * 2 * Math.PI - Math.PI / 2;
+      const hour12Angle = ((now.getHours() % 12 + now.getMinutes()/60) / 12) * 2 * Math.PI - Math.PI / 2;
+      const hour24Angle = ((now.getHours() + now.getMinutes()/60) / 24) * 2 * Math.PI - Math.PI / 2;
+      const hands = [
+        createArrow(centerX, centerY, centerX + Math.cos(secAngle) * radius60, centerY + Math.sin(secAngle) * radius60, "purple", 3),
+        createArrow(centerX, centerY, centerX + Math.cos(minAngle) * radius60 * 0.9, centerY + Math.sin(minAngle) * radius60 * 0.9, "blue", 4),
+        createArrow(centerX, centerY, centerX + Math.cos(hour12Angle) * radius12, centerY + Math.sin(hour12Angle) * radius12, "green", 5),
+        createArrow(centerX, centerY, centerX + Math.cos(hour24Angle) * radius24, centerY + Math.sin(hour24Angle) * radius24, "red", 5)
+      ];
+      return hands.map(render);
+    };
+
+    let currentHands = drawClockHands();
+
+    setInterval(() => {
+      currentHands.forEach(h => svg.removeChild(h));
+      currentHands = drawClockHands();
+    }, 1000);
+  ]]></script>
+</svg>
+<!-- END Time Compass Combined SVG -->
+
+  </div>
+</body>
+</html>

@@ -155,11 +155,14 @@
     const compassLineDiag = 212;
     const compassCenterCircle = 90; // Increased from 60 to 90
 
-    const compassLabelRadius = 160;
-    const compassLabelSpacingArab = 0;
-    const compassLabelSpacingBM = 24;
-    const compassLabelSpacingEN = 46;
-    const compassLabelSpacingDeg = 66;
+    const compassLabelRadius = 180; // Increased radius to prevent overlap with inner circle
+    // Calculate spacing for text blocks
+    const lineSpacing = 20; // Spacing between lines
+    // These spacing constants are kept for reference but no longer used in the new positioning system
+    const compassLabelSpacingArab = -lineSpacing * 1.5;  // -30
+    const compassLabelSpacingBM = -lineSpacing * 0.5;    // -10
+    const compassLabelSpacingEN = lineSpacing * 0.5;     // +10
+    const compassLabelSpacingDeg = lineSpacing * 1.5;    // +30
 
     const tickLengthMinutes = 10;
     const tickLength24 = 8;
@@ -206,8 +209,6 @@
       render(createLine(centerX - diagOffset, centerY + diagOffset, centerX + diagOffset, centerY - diagOffset, "gray", 1, "4 2"));
     };
 
-    drawDiameterLines();
-
     const drawTimeCircles = () => {
       const timeCircles = [
         { radius: radius60, color: "blue" },
@@ -217,15 +218,27 @@
       timeCircles.forEach(c => render(createCircle(centerX, centerY, c.radius, c.color, 1)));
     };
 
+    // Draw in correct order
+    drawTimeCircles();
+    drawDiameterLines();
+
     const addDirection = (angleDeg, arab, bm, en, deg) => {
       const angle = (angleDeg - 90) * Math.PI/180;
+
+      // Calculate the total height of the text block
+      const totalHeight = lineSpacing * 3; // Space for 4 lines of text
+
+      // Calculate position on compass circle
       const x = centerX + compassLabelRadius * Math.cos(angle);
       const y = centerY + compassLabelRadius * Math.sin(angle);
+
+      // Position text elements with their centers aligned to the angle
+      // Using the exact angle position for consistent alignment
       [
-        createText(x, y+compassLabelSpacingArab, arab, {size:22, lang:"arab"}),
-        createText(x, y+compassLabelSpacingBM, bm, {size:22, weight:"700"}),
-        createText(x, y+compassLabelSpacingEN, en, {size:18, style:"italic"}),
-        createText(x, y+compassLabelSpacingDeg, deg+"°", {size:12})
+        createText(x, y - totalHeight/2 + lineSpacing*0, arab, {size:22, lang:"arab"}),
+        createText(x, y - totalHeight/2 + lineSpacing*1, bm, {size:22, weight:"700"}),
+        createText(x, y - totalHeight/2 + lineSpacing*2, en, {size:18, style:"italic"}),
+        createText(x, y - totalHeight/2 + lineSpacing*3, deg+"°", {size:12})
       ].forEach(render);
     };
 

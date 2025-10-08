@@ -1,4 +1,4 @@
-![Screenshot](https://github.com/mnajib/time-compass-ext/raw/master/Screenshot_Time_Compass.png).
+![Screenshot](https://github.com/mnajib/time-compass-ext/blob/master/Screenshot_Time_Compass.png).
 
 # Time-Compass
 Display real/current:

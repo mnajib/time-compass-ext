@@ -1,6 +1,6 @@
 ![Screenshot](https://github.com/mnajib/time-compass-ext/raw/master/Screenshot_Time_Compass.png).
 
-# time-compass-ext
+# Time-Compass
 Display real/current:
 - analog clock in 24-hours, 12-hours, 60-minutes, 60-seconds
 - digital clock HH:MM:SS
@@ -9,6 +9,9 @@ Display real/current:
 - in Arab, Malay, English
 
 ## Todo
+- Size follow display size
+- Timezone
+- Option to toggle 24-hours or 12-hours clock
 - Add Hijri date
 
 ## License

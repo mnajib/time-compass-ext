@@ -27,6 +27,14 @@ function initializeSettings() {
   const show24HourToggle = document.getElementById('show24Hour');
 
   if (settingsBtn && settingsPanel && show12HourToggle && show24HourToggle) {
+    // Initialize toggles with stored values
+    browser.storage.local.get({
+      show12Hour: true,
+      show24Hour: true
+    }, (items) => {
+      show12HourToggle.checked = items.show12Hour;
+      show24HourToggle.checked = items.show24Hour;
+    });
     settingsBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       settingsPanel.classList.toggle('open');

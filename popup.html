@@ -112,35 +112,14 @@
       transform: translateX(26px);
     }
 
-    /* Digital Display Styles */
-    .digital-display {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      z-index: 2;
-      pointer-events: none;
+    /* SVG font settings */
+    @font-face {
+      font-family: 'JetBrains Mono';
+      src: local('JetBrains Mono');
     }
-
-    .digital-display .time {
-      font-size: 26px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .digital-display .date {
-      font-size: 18px;
-      font-style: italic;
-      color: #666;
-      margin: 5px 0;
-    }
-
-    .digital-display .day {
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
+    
+    svg text {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
     }
   </style>
 </head>
@@ -166,13 +145,6 @@
   </div>
 
   <div class="container">
-
-<!-- Digital Clock Display -->
-<div class="digital-display">
-  <div id="digital-time" class="time">--:--:--</div>
-  <div id="digital-date" class="date">----/--/--</div>
-  <div id="digital-day" class="day">------</div>
-</div>
 
 <!-- Clock SVG -->
 <svg id="clockSvg" xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">

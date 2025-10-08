@@ -243,12 +243,68 @@ function initializeClock(svg, settings) {
 
   function updateDigitalClock() {
     const now = getCurrentTime();
-    document.getElementById('digital-time').textContent = 
-      now.toLocaleTimeString(undefined, {hour12: false});
-    document.getElementById('digital-date').textContent = 
-      now.toLocaleDateString();
-    document.getElementById('digital-day').textContent = 
-      now.toLocaleDateString(undefined, {weekday: 'long'});
+    
+    // Get or create SVG text elements
+    let timeText = svg.querySelector('.digital-time');
+    let dateText = svg.querySelector('.digital-date');
+    let dayText = svg.querySelector('.digital-day');
+    
+    if (!timeText) {
+      timeText = createSVGElement('text', {
+        x: SVG_CONFIG.center.x,
+        y: SVG_CONFIG.center.y - 20,
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        'font-size': '24',
+        'font-weight': 'bold',
+        class: 'digital-time',
+        fill: '#000'
+      });
+      svg.appendChild(timeText);
+    }
+    
+    if (!dateText) {
+      dateText = createSVGElement('text', {
+        x: SVG_CONFIG.center.x,
+        y: SVG_CONFIG.center.y + 10,
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        'font-size': '16',
+        class: 'digital-date',
+        fill: '#000'
+      });
+      svg.appendChild(dateText);
+    }
+    
+    if (!dayText) {
+      dayText = createSVGElement('text', {
+        x: SVG_CONFIG.center.x,
+        y: SVG_CONFIG.center.y + 35,
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        'font-size': '14',
+        class: 'digital-day',
+        fill: '#333'
+      });
+      svg.appendChild(dayText);
+    }
+    
+    // Update the text content
+    timeText.textContent = now.toLocaleTimeString(undefined, {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    dateText.textContent = `${year}-${month}-${day}`;
+    
+    const monthName = now.toLocaleString('en-US', { month: 'long' });
+    const weekDay = now.toLocaleString('en-US', { weekday: 'long' });
+    dayText.textContent = `${monthName}, ${weekDay}`;
   }
 
   // Draw diameter lines

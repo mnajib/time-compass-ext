@@ -523,9 +523,11 @@
                 // Add toggle event handlers
                 show12HourToggle.addEventListener('change', (e) => {
                     show12Hour = e.target.checked;
+                    saveSettings();
                 });
                 show24HourToggle.addEventListener('change', (e) => {
                     show24Hour = e.target.checked;
+                    saveSettings();
                 });
 
                 settingsBtn.addEventListener('click', (e) => {
@@ -570,9 +572,15 @@
         };
     };
 
-    // Global state for clock hands visibility
-    let show12Hour = true;
-    let show24Hour = true;
+    // Global state for clock hands visibility with localStorage persistence
+    let show12Hour = localStorage.getItem('show12Hour') !== 'false';
+    let show24Hour = localStorage.getItem('show24Hour') !== 'false';
+
+    // Function to save settings
+    const saveSettings = () => {
+        localStorage.setItem('show12Hour', show12Hour);
+        localStorage.setItem('show24Hour', show24Hour);
+    };
 
     const drawClockHands = () => {
         const now = new Date(new Date().getTime() + 8 * 60 * 60 * 1000); // Malaysia = UTC+8

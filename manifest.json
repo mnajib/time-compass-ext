@@ -2,16 +2,21 @@
   "manifest_version": 3,
   "name": "Time Compass",
   "version": "1.0",
-  "description": "Shows the Time Compass (12h/24h/60m) with live animated hands and digital clock.",
+  "description": "A multilingual time compass showing time in 12/24-hour format with compass directions in Arabic, Malay, and English",
   "action": {
     "default_title": "Time Compass",
-    "default_popup": "popup.html",
     "default_icon": {
       "48": "icon48.png"
     }
   },
-  "icons": {
-    "48": "icon48.png"
+  "background": {
+    "scripts": ["background.js"]
   },
-  "permissions": []
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "permissions": ["storage", "tabs"]
 }

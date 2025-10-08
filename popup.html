@@ -1,9 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Time Compass</title>
+  <!-- Extension-specific styles -->
   <style>
     html,body {
       margin: 0;
@@ -110,6 +111,37 @@
     input:checked + .slider:before {
       transform: translateX(26px);
     }
+
+    /* Digital Display Styles */
+    .digital-display {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .digital-display .time {
+      font-size: 26px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .digital-display .date {
+      font-size: 18px;
+      font-style: italic;
+      color: #666;
+      margin: 5px 0;
+    }
+
+    .digital-display .day {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -135,44 +167,20 @@
 
   <div class="container">
 
-<!-- BEGIN Time Compass Combined SVG (copied verbatim) -->
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
-  <script type="application/ecmascript"><![CDATA[
-    /**
-     * Time Compass Combined - An interactive visualization combining:
-     * 1. A 12-hour clock (green)
-     * 2. A 24-hour clock (red)
-     * 3. A minute/second display (blue/purple)
-     * 4. A digital clock with date
-     * 5. Compass directions in three languages
-     *
-     * This implementation follows functional programming principles:
-     * - Pure functions where possible
-     * - Immutable state
-     * - Declarative style
-     * - Composition over inheritance
-     */
+<!-- Digital Clock Display -->
+<div class="digital-display">
+  <div id="digital-time" class="time">--:--:--</div>
+  <div id="digital-date" class="date">----/--/--</div>
+  <div id="digital-day" class="day">------</div>
+</div>
 
-    // SVG Canvas Configuration
-    const svg = document.currentScript.ownerSVGElement;
-    const SVG_CONFIG = Object.freeze({
-        width: svg.viewBox.baseVal.width,
-        height: svg.viewBox.baseVal.height,
-        center: {
-            x: svg.viewBox.baseVal.width / 2,
-            y: svg.viewBox.baseVal.height / 2
-        }
-    });
-
-    // Clock Radii Configuration (from inner to outer)
-    const CLOCK_RADII = Object.freeze({
-        hour12: 280,                    // Green 12-hour circle
-        hour24: 280 + 70,              // Red 24-hour circle
-        minute: 280 + 70 + 70          // Blue minute/second circle
-    });
-
-    // Compass Configuration
-    const COMPASS_CONFIG = Object.freeze({
+<!-- Clock SVG -->
+<svg id="clockSvg" xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="2.5" orient="auto-start-reverse">
+      <path d="M0,0 L5,2.5 L0,5 Z" fill="black"/>
+    </marker>
+  </defs>
         radius: 200,                    // Base compass circle radius
         lineDiagonal: 212,             // Length of diagonal lines
         centerCircle: 90,              // Central white circle radius
@@ -427,226 +435,9 @@
         "black",
         2,
         "white"
-    ));
-
-    // Digital clock configuration
-    const DIGITAL_CLOCK_CONFIG = Object.freeze({
-        time: { y: -18, size: 26, weight: "700" },
-        date: { y: 10, size: 18, style: "italic" },
-        day: { y: 34, size: 18, weight: "700" }
-    });
-
-    // Create digital clock elements
-    const digitalElements = {
-        time: render(createText(SVG_CONFIG.center.x, SVG_CONFIG.center.y + DIGITAL_CLOCK_CONFIG.time.y,
-                              "--:--:--", DIGITAL_CLOCK_CONFIG.time)),
-        date: render(createText(SVG_CONFIG.center.x, SVG_CONFIG.center.y + DIGITAL_CLOCK_CONFIG.date.y,
-                              "----/--/--", DIGITAL_CLOCK_CONFIG.date)),
-        day: render(createText(SVG_CONFIG.center.x, SVG_CONFIG.center.y + DIGITAL_CLOCK_CONFIG.day.y,
-                             "------", DIGITAL_CLOCK_CONFIG.day))
-    };
-
-    const updateDigitalClock = () => {
-        const nowUTC = new Date();
-        const now = new Date(nowUTC.getTime() + 8 * 60 * 60 * 1000); // Malaysia = UTC+8
-        const timeStr = now.toLocaleTimeString([], {hour12: false});
-        const dateStr = now.toISOString().split('T')[0];
-        const dayStr = now.toLocaleDateString('en-US', {weekday: 'long'});
-
-        digitalElements.time.textContent = timeStr;
-        digitalElements.date.textContent = dateStr;
-        digitalElements.day.textContent = dayStr;
-    };
-    setInterval(updateDigitalClock, 1000);
-    updateDigitalClock();
-
-    // Tick mark configuration
-    const TICK_CONFIG = Object.freeze({
-        minutes: { length: 10, fontSize: 14, step: 5, color: "blue", weight: "700" },
-        hour24: { length: 8, fontSize: 16, step: 1, color: "red", weight: "700" },
-        hour12: { length: 12, fontSize: 18, step: 1, color: "green", weight: "700" },
-        labelOffset: 20
-    });
-
-    /**
-     * Creates tick marks and labels for a clock circle
-     * @param {Object} config - Configuration for the tick marks
-     */
-    const addTicks = (count, radius, tickLen, fontSize, labelStep=1, labelMax=null, labelFilter=null, color="black", weight="normal") => {
-        const { x: centerX, y: centerY } = SVG_CONFIG.center;
-
-        for (let i = 0; i < count; i++) {
-            const angle = (i / count) * 2 * Math.PI - Math.PI / 2;
-            const x1 = centerX + radius * Math.cos(angle);
-            const y1 = centerY + radius * Math.sin(angle);
-            const x2 = centerX + (radius - tickLen) * Math.cos(angle);
-            const y2 = centerY + (radius - tickLen) * Math.sin(angle);
-
-            render(createLine(x1, y1, x2, y2, color));
-
-            if (i % labelStep === 0 && (!labelFilter || labelFilter.includes(i || labelMax))) {
-                const x = centerX + (radius - tickLen - TICK_CONFIG.labelOffset) * Math.cos(angle);
-                const y = centerY + (radius - tickLen - TICK_CONFIG.labelOffset) * Math.sin(angle);
-                const label = (i === 0 && labelMax) ? labelMax : i;
-                render(createText(x, y, label, {size: fontSize, color, weight}));
-            }
-        }
-    };
-
-    // Draw tick marks for each circle
-    addTicks(60, CLOCK_RADII.minute, TICK_CONFIG.minutes.length,
-            TICK_CONFIG.minutes.fontSize, TICK_CONFIG.minutes.step, 60, null,
-            TICK_CONFIG.minutes.color, TICK_CONFIG.minutes.weight);
-
-    addTicks(24, CLOCK_RADII.hour24, TICK_CONFIG.hour24.length,
-            TICK_CONFIG.hour24.fontSize, TICK_CONFIG.hour24.step, 24,
-            [3,6,9,12,15,18,21,24], TICK_CONFIG.hour24.color, TICK_CONFIG.hour24.weight);
-
-    addTicks(12, CLOCK_RADII.hour12, TICK_CONFIG.hour12.length,
-            TICK_CONFIG.hour12.fontSize, TICK_CONFIG.hour12.step, 12, null,
-            TICK_CONFIG.hour12.color, TICK_CONFIG.hour12.weight);
-
-    // Settings panel functionality
-    const initializeSettings = () => {
-        // Wait for DOM elements to be available
-        setTimeout(() => {
-            const settingsBtn = document.querySelector('.settings-btn');
-            const settingsPanel = document.querySelector('.settings-panel');
-            const show12HourToggle = document.getElementById('show12Hour');
-            const show24HourToggle = document.getElementById('show24Hour');
-
-            if (settingsBtn && settingsPanel && show12HourToggle && show24HourToggle) {
-                // Initialize toggles to match our state
-                show12HourToggle.checked = show12Hour;
-                show24HourToggle.checked = show24Hour;
-
-                // Add toggle event handlers
-                show12HourToggle.addEventListener('change', (e) => {
-                    show12Hour = e.target.checked;
-                    saveSettings();
-                });
-                show24HourToggle.addEventListener('change', (e) => {
-                    show24Hour = e.target.checked;
-                    saveSettings();
-                });
-
-                settingsBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    settingsPanel.classList.toggle('open');
-                });
-
-                // Close panel when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) {
-                        settingsPanel.classList.remove('open');
-                    }
-                });
-            }
-        }, 100); // Short delay to ensure DOM is ready
-    };
-
-    initializeSettings();
-
-    /**
-     * Clock hand configuration
-     */
-    const CLOCK_HANDS = Object.freeze({
-        hour12: { color: "green", width: 5 },
-        hour24: { color: "red", width: 5 },
-        minute: { color: "blue", width: 4 },
-        second: { color: "purple", width: 3 }
-    });
-
-    /**
-     * Calculate clock angles from current time
-     * @param {Date} now - Current time
-     * @returns {Object} Angles for each hand in radians
-     */
-    const calculateClockAngles = (now) => {
-        const minuteFraction = now.getMinutes() / 60;
-        return {
-            second: (now.getSeconds() / 60) * 2 * Math.PI - Math.PI / 2,
-            minute: (minuteFraction) * 2 * Math.PI - Math.PI / 2,
-            hour12: ((now.getHours() % 12 + minuteFraction) / 12) * 2 * Math.PI - Math.PI / 2,
-            hour24: ((now.getHours() + minuteFraction) / 24) * 2 * Math.PI - Math.PI / 2
-        };
-    };
-
-    // Global state for clock hands visibility with localStorage persistence
-    let show12Hour = localStorage.getItem('show12Hour') !== 'false';
-    let show24Hour = localStorage.getItem('show24Hour') !== 'false';
-
-    // Function to save settings
-    const saveSettings = () => {
-        localStorage.setItem('show12Hour', show12Hour);
-        localStorage.setItem('show24Hour', show24Hour);
-    };
-
-    const drawClockHands = () => {
-        const now = new Date(new Date().getTime() + 8 * 60 * 60 * 1000); // Malaysia = UTC+8
-        const angles = calculateClockAngles(now);
-        const { x: centerX, y: centerY } = SVG_CONFIG.center;
-
-        // Helper function to get arrow start point at circle edge
-        const getStartPoint = (angle) => ({
-            x: centerX + Math.cos(angle) * COMPASS_CONFIG.centerCircle,
-            y: centerY + Math.sin(angle) * COMPASS_CONFIG.centerCircle
-        });
-
-        const hands = [];
-
-        // Add hands based on visibility state
-        if (show12Hour) {
-            const start = getStartPoint(angles.hour12);
-            hands.push(createArrow(
-                start.x, start.y,
-                centerX + Math.cos(angles.hour12) * CLOCK_RADII.hour12,
-                centerY + Math.sin(angles.hour12) * CLOCK_RADII.hour12,
-                CLOCK_HANDS.hour12.color, CLOCK_HANDS.hour12.width
-            ));
-        }
-
-        if (show24Hour) {
-            const start = getStartPoint(angles.hour24);
-            hands.push(createArrow(
-                start.x, start.y,
-                centerX + Math.cos(angles.hour24) * CLOCK_RADII.hour24,
-                centerY + Math.sin(angles.hour24) * CLOCK_RADII.hour24,
-                CLOCK_HANDS.hour24.color, CLOCK_HANDS.hour24.width
-            ));
-        }
-
-        // Always show minute and second hands
-        const minStart = getStartPoint(angles.minute);
-        const secStart = getStartPoint(angles.second);
-
-        hands.push(
-            createArrow(
-                minStart.x, minStart.y,
-                centerX + Math.cos(angles.minute) * CLOCK_RADII.minute,
-                centerY + Math.sin(angles.minute) * CLOCK_RADII.minute,
-                CLOCK_HANDS.minute.color, CLOCK_HANDS.minute.width
-            ),
-            createArrow(
-                secStart.x, secStart.y,
-                centerX + Math.cos(angles.second) * CLOCK_RADII.minute,
-                centerY + Math.sin(angles.second) * CLOCK_RADII.minute,
-                CLOCK_HANDS.second.color, CLOCK_HANDS.second.width
-            )
-        );
-
-        return hands.map(render);
-    };
-
-    let currentHands = drawClockHands();
-
-    setInterval(() => {
-      currentHands.forEach(h => svg.removeChild(h));
-      currentHands = drawClockHands();
-    }, 1000);
-  ]]></script>
 </svg>
-<!-- END Time Compass Combined SVG -->
+<!-- Load the extension script -->
+<script src="script.js"></script>
 
   </div>
 </body>

@@ -31,7 +31,7 @@
 
     const radiusCompass = 200;
     const compassLineDiag = 212;
-    const compassCenterCircle = 60;
+    const compassCenterCircle = 90; // Increased from 60 to 90
 
     const compassLabelRadius = 160;
     const compassLabelSpacingArab = 0;
@@ -115,23 +115,25 @@
       [45, "شَمَال شَرْق", "Timur Laut", "Northeast", 45],
       [135, "جَنُوب شَرْق", "Tenggara", "Southeast", 135],
       [225, "جَنُوب غَرْب", "Barat Daya", "Southwest", 225],
-      [315, "شَمَال غَرْب", "Barat Laut", "Northwest", 315]
+      [315, "شَمَال غَرْب", "Barات Laut", "Northwest", 315]
     ].forEach(args => addDirection(...args));
 
     render(createCircle(centerX, centerY, compassCenterCircle, "black", 2, "white"));
 
     // Replace center text with digital time and date display
-    const digitalTime = render(createText(centerX, centerY - 6, "--:--:--", {size:26, weight:"700"}));
-    const digitalDate = render(createText(centerX, centerY + 24, "----/--/--", {size:18, style:"italic"}));
+    const digitalTime = render(createText(centerX, centerY - 18, "--:--:--", {size:26, weight:"700"}));
+    const digitalDate = render(createText(centerX, centerY + 10, "----/--/--", {size:18, style:"italic"}));
+    const digitalDay = render(createText(centerX, centerY + 34, "------", {size:18, weight:"700"}));
 
     const updateDigitalClock = () => {
-      //const now = new Date();
       const nowUTC = new Date();
       const now = new Date(nowUTC.getTime() + 8 * 60 * 60 * 1000); // Malaysia = UTC+8
       const timeStr = now.toLocaleTimeString([], {hour12:false});
       const dateStr = now.toISOString().split('T')[0];
+      const dayStr = now.toLocaleDateString('en-US', {weekday: 'long'});
       digitalTime.textContent = timeStr;
       digitalDate.textContent = dateStr;
+      digitalDay.textContent = dayStr;
     };
     setInterval(updateDigitalClock, 1000);
     updateDigitalClock();
@@ -183,12 +185,44 @@
       const minAngle = (now.getMinutes() / 60) * 2 * Math.PI - Math.PI / 2;
       const hour12Angle = ((now.getHours() % 12 + now.getMinutes()/60) / 12) * 2 * Math.PI - Math.PI / 2;
       const hour24Angle = ((now.getHours() + now.getMinutes()/60) / 24) * 2 * Math.PI - Math.PI / 2;
+
+      // Helper function to get arrow start point at circle edge
+      const getStartPoint = (angle) => {
+        return {
+          x: centerX + Math.cos(angle) * compassCenterCircle,
+          y: centerY + Math.sin(angle) * compassCenterCircle
+        };
+      };
+
       const hands = [
-        createArrow(centerX, centerY, centerX + Math.cos(hour12Angle) * radius12, centerY + Math.sin(hour12Angle) * radius12, "green", 5),
-        createArrow(centerX, centerY, centerX + Math.cos(hour24Angle) * radius24, centerY + Math.sin(hour24Angle) * radius24, "red", 5),
-        //createArrow(centerX, centerY, centerX + Math.cos(minAngle) * radius60 * 0.9, centerY + Math.sin(minAngle) * radius60 * 0.9, "blue", 4),
-        createArrow(centerX, centerY, centerX + Math.cos(minAngle) * radius60, centerY + Math.sin(minAngle) * radius60, "blue", 4),
-        createArrow(centerX, centerY, centerX + Math.cos(secAngle) * radius60, centerY + Math.sin(secAngle) * radius60, "purple", 3)
+        createArrow(
+          getStartPoint(hour12Angle).x,
+          getStartPoint(hour12Angle).y,
+          centerX + Math.cos(hour12Angle) * radius12,
+          centerY + Math.sin(hour12Angle) * radius12,
+          "green", 5
+        ),
+        createArrow(
+          getStartPoint(hour24Angle).x,
+          getStartPoint(hour24Angle).y,
+          centerX + Math.cos(hour24Angle) * radius24,
+          centerY + Math.sin(hour24Angle) * radius24,
+          "red", 5
+        ),
+        createArrow(
+          getStartPoint(minAngle).x,
+          getStartPoint(minAngle).y,
+          centerX + Math.cos(minAngle) * radius60,
+          centerY + Math.sin(minAngle) * radius60,
+          "blue", 4
+        ),
+        createArrow(
+          getStartPoint(secAngle).x,
+          getStartPoint(secAngle).y,
+          centerX + Math.cos(secAngle) * radius60,
+          centerY + Math.sin(secAngle) * radius60,
+          "purple", 3
+        )
       ];
       return hands.map(render);
     };

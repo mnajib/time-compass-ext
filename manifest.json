@@ -1,16 +1,17 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Time Compass",
-  "version": "1.0",
-  "description": "A multilingual time compass showing time in 12/24-hour format with compass directions in Arabic, Malay, and English",
-  "action": {
+  "version": "1.1",
+  "description": "A multilingual time compass showing time in 12/24-hour format with compass directions in Arabic, Malay, and English.",
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "browser_action": {
     "default_title": "Time Compass",
     "default_icon": {
       "48": "icon48.png"
     }
-  },
-  "background": {
-    "scripts": ["background.js"]
   },
   "icons": {
     "16": "icon16.png",
@@ -18,5 +19,15 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
-  "permissions": ["storage", "tabs"]
+  "permissions": ["storage", "tabs"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "time-compass@example.com",
+      "strict_min_version": "78.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
 }
+

@@ -1,7 +1,9 @@
 // Listen for clicks on the extension icon
-browser.action.onClicked.addListener(() => {
+browser.browserAction.onClicked.addListener(() => {
   // Open popup.html in a new tab
   browser.tabs.create({
-    url: 'popup.html'
+    //url: "popup.html"
+    url: browser.runtime.getURL('popup.html')
   });
 });
+

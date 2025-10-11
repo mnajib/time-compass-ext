@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Time Compass",
-  "version": "1.1",
+  "version": "1.1.2",
   "description": "A multilingual time compass showing time in 12/24-hour format with compass directions in Arabic, Malay, and English.",
   "background": {
     "scripts": ["background.js"],

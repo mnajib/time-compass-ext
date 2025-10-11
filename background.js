@@ -114,10 +114,11 @@ const handleToolbarClick = async () => {
 browser.runtime.onInstalled.addListener(handleInstallEvent);
 
 // For Firefox, use `browser.action` instead of `browser.browserAction`
-if (browser.action) {
+/* if (browser.action) {
   browser.action.onClicked.addListener(handleToolbarClick);
 } else if (browser.browserAction) {
   browser.browserAction.onClicked.addListener(handleToolbarClick);
-}
+} */
+browser.browserAction.onClicked.addListener(handleToolbarClick);
 
 console.log("[Time Compass] Background script loaded successfully.");

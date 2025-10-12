@@ -95,9 +95,11 @@ const COMPASS_CONFIG = {
 
 const DIRECTION_STYLE = {
   arabic: { size: 22, lang: "arab" },
-  malay: { size: 22, weight: "700" },
+  //malay: { size: 22, weight: "700" },
+  malay: { size: 18, weight: "700" },
   english: { size: 18, style: "italic" },
-  degree: { size: 12 }
+  //degree: { size: 12 }
+  degree: { size: 14 }
 };
 
 const COMPASS_DIRECTIONS = [
@@ -449,7 +451,8 @@ function initializeClock(svg, settings) {
           x, y,
           'text-anchor': 'middle',
           'dominant-baseline': 'middle',
-          'font-size': '16',
+          //'font-size': '16',
+          'font-size': '48',
           fill: 'red',
           'font-weight': 'bold'
         });
@@ -468,7 +471,8 @@ function initializeClock(svg, settings) {
         x, y,
         'text-anchor': 'middle',
         'dominant-baseline': 'middle',
-        'font-size': '18',
+        //'font-size': '18',
+        'font-size': '32',
         fill: 'green',
         'font-weight': 'bold'
       });

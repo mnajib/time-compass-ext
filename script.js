@@ -132,8 +132,10 @@ function initializeClock(svg, settings) {
 
   // Clock hands configuration
   const CLOCK_HANDS = {
-    hour12: { color: "green", width: 5 },
-    hour24: { color: "red", width: 5 },
+    //hour12: { color: "green", width: 5 },
+    //hour24: { color: "red", width: 5 },
+    hour12: { color: "green", width: 7 },
+    hour24: { color: "red", width: 8 },
     minute: { color: "blue", width: 4 },
     second: { color: "purple", width: 3 }
   };
@@ -444,8 +446,10 @@ function initializeClock(svg, settings) {
     for (let i = 0; i < 24; i++) {
       if (i % 3 === 0) { // Show every 3 hours
         const angle = (i / 24) * 2 * Math.PI - Math.PI / 2;
-        const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - 20);
-        const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - 20);
+        //const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - 20);
+        //const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - 20);
+        const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - 33);
+        const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - 33);
 
         const text = createSVGElement('text', {
           x, y,

@@ -279,10 +279,12 @@ function initializeClock(svg, settings) {
     if (!dateText) {
       dateText = createSVGElement('text', {
         x: SVG_CONFIG.center.x,
-        y: SVG_CONFIG.center.y + 15,
+        //y: SVG_CONFIG.center.y + 15,
+        y: SVG_CONFIG.center.y + 35,
         'text-anchor': 'middle',
         'dominant-baseline': 'middle',
         'font-size': '16',
+        'font-weight': 'bold',
         class: 'digital-date',
         fill: '#000'
       });
@@ -296,6 +298,7 @@ function initializeClock(svg, settings) {
         'text-anchor': 'middle',
         'dominant-baseline': 'middle',
         'font-size': '14',
+        'font-weight': 'bold',
         class: 'digital-day',
         fill: '#333'
       });
@@ -324,7 +327,8 @@ function initializeClock(svg, settings) {
     if (!monthText) {
       monthText = createSVGElement('text', {
         x: SVG_CONFIG.center.x,
-        y: SVG_CONFIG.center.y + 35,
+        //y: SVG_CONFIG.center.y + 35,
+        y: SVG_CONFIG.center.y + 15,
         'text-anchor': 'middle',
         'dominant-baseline': 'middle',
         'font-size': '14',
@@ -334,7 +338,7 @@ function initializeClock(svg, settings) {
       svg.appendChild(monthText);
     }
     monthText.textContent = monthName;
-  }
+  } // End of updateDigitalClock() { ... }
 
   // Draw diameter lines
   function drawDiameterLines() {
@@ -366,7 +370,7 @@ function initializeClock(svg, settings) {
       });
       svg.appendChild(line);
     });
-  }
+  } // End of drawDiameterLines() { ... }
 
   // Draw tick marks and numbers
   function drawTicks() {
@@ -585,7 +589,8 @@ function initializeClock(svg, settings) {
 
     const nightPath = createSVGElement('path', {
       d: pathData,
-      fill: 'rgba(0, 0, 0, 0.15)',  // Soft dark semi-transparent background
+      //fill: 'rgba(0, 0, 0, 0.15)',  // Soft dark semi-transparent background
+      fill: 'rgba(0, 0, 0, 0.25)',
       stroke: 'none'
     });
 
@@ -633,4 +638,4 @@ function initializeClock(svg, settings) {
   }, 1000);
 
   // Settings handlers - already handled in initializeSettings()
-}
+} // End of function initializeClock(svg, settings) { ... }

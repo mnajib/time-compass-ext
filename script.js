@@ -633,7 +633,8 @@ function initializeClock(svg, settings) {
       r: backgroundRadius,
       //fill: 'black',
       //fill: 'white',
-      fill: 'gray',
+      //fill: 'gray',
+      fill: '#e0e0e0',
       stroke: 'none'
     });
     svg.appendChild(circle);
@@ -646,7 +647,8 @@ function initializeClock(svg, settings) {
       cy: SVG_CONFIG.center.y,
       r: backgroundRadius,
       //fill: 'black',
-      fill: '#6db6ff',
+      //fill: '#6db6ff',
+      fill: '#b5dafe',
       stroke: 'none'
     });
     svg.appendChild(circle);
@@ -673,7 +675,9 @@ function initializeClock(svg, settings) {
       cy: SVG_CONFIG.center.y,
       r: backgroundRadius,
       //fill: 'black',
-      fill: '#b66dff',
+      //fill: '#b66dff',
+      //fill: '#71c0a7',
+      fill: '#cae7d3',
       stroke: 'none'
     });
     svg.appendChild(circle);

@@ -177,18 +177,19 @@ function initializeClock(svg, settings) {
 
   function drawTimeCircles() {
     const circles = [
-      { radius: CLOCK_RADII.minute, color: "blue" },
-      { radius: CLOCK_RADII.hour24, color: "red" },
-      { radius: CLOCK_RADII.hour12, color: "green" }
+      { radius: CLOCK_RADII.minute, color: "blue", strokewidth: '1' },
+      { radius: CLOCK_RADII.hour24, color: "red", strokewidth: '5' },
+      { radius: CLOCK_RADII.hour12, color: "green", strokewidth: '1' }
     ];
 
-    circles.forEach(({ radius, color }) => {
+    circles.forEach(({ radius, color, strokewidth }) => {
       const circle = createSVGElement('circle', {
         cx: SVG_CONFIG.center.x,
         cy: SVG_CONFIG.center.y,
         r: radius,
         stroke: color,
-        'stroke-width': '1',
+        //'stroke-width': '1',
+        'stroke-width': strokewidth,
         fill: 'none'
       });
       svg.appendChild(circle);
@@ -369,6 +370,7 @@ function initializeClock(svg, settings) {
 
   // Draw tick marks and numbers
   function drawTicks() {
+
     // Minute ticks
     for (let i = 0; i < 60; i++) {
       const angle = (i / 60) * 2 * Math.PI - Math.PI / 2;
@@ -409,7 +411,8 @@ function initializeClock(svg, settings) {
     for (let i = 0; i < 24; i++) {
       const angle = (i / 24) * 2 * Math.PI - Math.PI / 2;
       const isMainTick = i % 3 === 0;
-      const length = isMainTick ? 12 : 8;
+      //const length = isMainTick ? 12 : 8;
+      const length = isMainTick ? 12 : 12;
 
       const x1 = SVG_CONFIG.center.x + Math.cos(angle) * CLOCK_RADII.hour24;
       const y1 = SVG_CONFIG.center.y + Math.sin(angle) * CLOCK_RADII.hour24;
@@ -419,7 +422,8 @@ function initializeClock(svg, settings) {
       const tick = createSVGElement('line', {
         x1, y1, x2, y2,
         stroke: 'red',
-        'stroke-width': isMainTick ? '2' : '1'
+        //'stroke-width': isMainTick ? '2' : '1'
+        'stroke-width': isMainTick ? '8' : '4'
       });
       svg.appendChild(tick);
     }
@@ -448,15 +452,16 @@ function initializeClock(svg, settings) {
         const angle = (i / 24) * 2 * Math.PI - Math.PI / 2;
         //const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - 20);
         //const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - 20);
-        const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - 33);
-        const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - 33);
+        const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - 35);
+        const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - 35);
 
         const text = createSVGElement('text', {
           x, y,
           'text-anchor': 'middle',
           'dominant-baseline': 'middle',
           //'font-size': '16',
-          'font-size': '48',
+          //'font-size': '48',
+          'font-size': '35',
           fill: 'red',
           'font-weight': 'bold'
         });

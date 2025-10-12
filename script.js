@@ -531,6 +531,58 @@ function initializeClock(svg, settings) {
     });
   }
 
+  // Draw nighttime background (18:00 to 06:00)
+  function drawNighttimeBackground() {
+    const { x: cx, y: cy } = SVG_CONFIG.center;
+    const innerRadius = CLOCK_RADII.hour12;
+    const outerRadius = CLOCK_RADII.hour24;
+
+    // Calculate angles for 18:00 and 06:00 on 24-hour clock
+    // Using the same formula as in calculateClockAngles
+    const hour18Angle = (18 / 24) * 2 * Math.PI - Math.PI / 2; // 18:00
+    const hour06Angle = (6 / 24) * 2 * Math.PI - Math.PI / 2;  // 06:00
+
+    // Calculate start and end points on both circles
+    // Start at 18:00 on inner circle
+    const startInnerX = cx + Math.cos(hour18Angle) * innerRadius;
+    const startInnerY = cy + Math.sin(hour18Angle) * innerRadius;
+
+    // End at 06:00 on inner circle
+    const endInnerX = cx + Math.cos(hour06Angle) * innerRadius;
+    const endInnerY = cy + Math.sin(hour06Angle) * innerRadius;
+
+    // Start at 18:00 on outer circle
+    const startOuterX = cx + Math.cos(hour18Angle) * outerRadius;
+    const startOuterY = cy + Math.sin(hour18Angle) * outerRadius;
+
+    // End at 06:00 on outer circle
+    const endOuterX = cx + Math.cos(hour06Angle) * outerRadius;
+    const endOuterY = cy + Math.sin(hour06Angle) * outerRadius;
+
+    // Create path for the nighttime arc segment
+    // The arc goes from 18:00 clockwise through midnight to 06:00 (which is 12 hours = 180 degrees)
+    // Since we're going from 18:00 (π) to 06:00 (0), we cross over the top
+    // We use largeArcFlag = 1 because we're spanning more than 180 degrees
+    const largeArcFlag = 1;
+    const sweepFlag = 1; // clockwise direction
+
+    const pathData = [
+      `M ${startInnerX} ${startInnerY}`,                                          // Move to 18:00 on inner circle
+      `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} ${sweepFlag} ${endInnerX} ${endInnerY}`, // Arc to 06:00 on inner circle
+      `L ${endOuterX} ${endOuterY}`,                                             // Line to 06:00 on outer circle
+      `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 0 ${startOuterX} ${startOuterY}`, // Arc back to 18:00 on outer circle (counter-clockwise)
+      `Z`                                                                         // Close path
+    ].join(' ');
+
+    const nightPath = createSVGElement('path', {
+      d: pathData,
+      fill: 'rgba(0, 0, 0, 0.15)',  // Soft dark semi-transparent background
+      stroke: 'none'
+    });
+
+    svg.appendChild(nightPath);
+  }
+
   // Draw center white circle
   function drawCenterCircle() {
     const circle = createSVGElement('circle', {
@@ -547,6 +599,7 @@ function initializeClock(svg, settings) {
   // Initialize clock
   initializeArrowhead();
   drawDiameterLines();
+  drawNighttimeBackground();  // Draw nighttime background before circles
   drawTimeCircles();
   drawTicks();
   drawCompassDirections();

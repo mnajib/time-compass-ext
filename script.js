@@ -177,12 +177,13 @@ function initializeClock(svg, settings) {
 
   function drawTimeCircles() {
     const circles = [
-      { radius: CLOCK_RADII.minute, color: "blue", strokewidth: '1' },
-      { radius: CLOCK_RADII.hour24, color: "red", strokewidth: '5' },
-      { radius: CLOCK_RADII.hour12, color: "green", strokewidth: '1' }
+      { radius: CLOCK_RADII.minute, color: "blue", strokewidth: '1', fillcolor: 'none' },
+      //{ radius: CLOCK_RADII.minute, color: "blue", strokewidth: '1', fillcolor: '#dddddd' },
+      { radius: CLOCK_RADII.hour24, color: "red", strokewidth: '5', fillcolor: 'none' },
+      { radius: CLOCK_RADII.hour12, color: "green", strokewidth: '1', fillcolor: 'none' }
     ];
 
-    circles.forEach(({ radius, color, strokewidth }) => {
+    circles.forEach(({ radius, color, strokewidth, fillcolor }) => {
       const circle = createSVGElement('circle', {
         cx: SVG_CONFIG.center.x,
         cy: SVG_CONFIG.center.y,
@@ -190,7 +191,9 @@ function initializeClock(svg, settings) {
         stroke: color,
         //'stroke-width': '1',
         'stroke-width': strokewidth,
-        fill: 'none'
+        //fill: 'none'
+        //fill: '#000099'
+        fill: fillcolor
       });
       svg.appendChild(circle);
     });
@@ -610,8 +613,23 @@ function initializeClock(svg, settings) {
     svg.appendChild(circle);
   }
 
+  // Draw background circle (behind everything else)
+  function drawBackgroundCircle() {
+    const backgroundRadius = CLOCK_RADII.minute + 25; // 25px gap from outermost circle
+    const circle = createSVGElement('circle', {
+      cx: SVG_CONFIG.center.x,
+      cy: SVG_CONFIG.center.y,
+      r: backgroundRadius,
+      //fill: 'black',
+      fill: 'white',
+      stroke: 'none'
+    });
+    svg.appendChild(circle);
+  }
+
   // Initialize clock
   initializeArrowhead();
+  drawBackgroundCircle();  // Draw background first (behind everything)
   drawDiameterLines();
   drawNighttimeBackground();  // Draw nighttime background before circles
   drawTimeCircles();

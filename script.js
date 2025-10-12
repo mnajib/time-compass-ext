@@ -135,7 +135,8 @@ function initializeClock(svg, settings) {
     //hour12: { color: "green", width: 5 },
     //hour24: { color: "red", width: 5 },
     hour12: { color: "green", width: 7 },
-    hour24: { color: "red", width: 8 },
+    //hour24: { color: "red", width: 8 },
+    hour24: { color: "black", width: 8 },
     minute: { color: "blue", width: 4 },
     second: { color: "purple", width: 3 }
   };
@@ -159,7 +160,8 @@ function initializeClock(svg, settings) {
       id: 'arrowhead',
       markerWidth: '10',
       markerHeight: '10',
-      refX: '5',
+      //refX: '5',
+      refX: '0',
       refY: '2.5',
       orient: 'auto-start-reverse'
     });
@@ -167,6 +169,7 @@ function initializeClock(svg, settings) {
     const path = createSVGElement('path', {
       d: 'M0,0 L5,2.5 L0,5 Z',
       fill: 'black'
+      //fill: 'rgba(255, 0, 0, 0.50)'
     });
 
     marker.appendChild(path);
@@ -179,7 +182,8 @@ function initializeClock(svg, settings) {
     const circles = [
       { radius: CLOCK_RADII.minute, color: "blue", strokewidth: '1', fillcolor: 'none' },
       //{ radius: CLOCK_RADII.minute, color: "blue", strokewidth: '1', fillcolor: '#dddddd' },
-      { radius: CLOCK_RADII.hour24, color: "red", strokewidth: '5', fillcolor: 'none' },
+      //{ radius: CLOCK_RADII.hour24, color: "red", strokewidth: '5', fillcolor: 'none' },
+      { radius: CLOCK_RADII.hour24, color: "black", strokewidth: '5', fillcolor: 'none' },
       { radius: CLOCK_RADII.hour12, color: "green", strokewidth: '1', fillcolor: 'none' }
     ];
 
@@ -207,13 +211,17 @@ function initializeClock(svg, settings) {
     Array.from(svg.querySelectorAll('.clock-hand')).forEach(hand => hand.remove());
 
     if (show12Hour) {
-      drawHand(angles.hour12, CLOCK_RADII.hour12, CLOCK_HANDS.hour12);
+      //drawHand(angles.hour12, CLOCK_RADII.hour12, CLOCK_HANDS.hour12);
+      drawHand(angles.hour12, CLOCK_RADII.hour12 - 35, CLOCK_HANDS.hour12);
     }
     if (show24Hour) {
-      drawHand(angles.hour24, CLOCK_RADII.hour24, CLOCK_HANDS.hour24);
+      //drawHand(angles.hour24, CLOCK_RADII.hour24, CLOCK_HANDS.hour24);
+      drawHand(angles.hour24, CLOCK_RADII.hour24 - 40, CLOCK_HANDS.hour24);
     }
-    drawHand(angles.minute, CLOCK_RADII.minute, CLOCK_HANDS.minute);
-    drawHand(angles.second, CLOCK_RADII.minute, CLOCK_HANDS.second);
+    //drawHand(angles.minute, CLOCK_RADII.minute, CLOCK_HANDS.minute);
+    //drawHand(angles.second, CLOCK_RADII.minute, CLOCK_HANDS.second);
+    drawHand(angles.minute, CLOCK_RADII.minute - 20, CLOCK_HANDS.minute);
+    drawHand(angles.second, CLOCK_RADII.minute - 15, CLOCK_HANDS.second);
   }
 
   function drawHand(angle, length, style) {
@@ -428,7 +436,8 @@ function initializeClock(svg, settings) {
 
       const tick = createSVGElement('line', {
         x1, y1, x2, y2,
-        stroke: 'red',
+        //stroke: 'red',
+        stroke: 'black',
         //'stroke-width': isMainTick ? '2' : '1'
         'stroke-width': isMainTick ? '8' : '4'
       });
@@ -469,7 +478,8 @@ function initializeClock(svg, settings) {
           //'font-size': '16',
           //'font-size': '48',
           'font-size': '35',
-          fill: 'red',
+          //fill: 'red',
+          fill: 'black',
           'font-weight': 'bold'
         });
         text.textContent = i === 0 ? '24' : i;
@@ -594,6 +604,7 @@ function initializeClock(svg, settings) {
       d: pathData,
       //fill: 'rgba(0, 0, 0, 0.15)',  // Soft dark semi-transparent background
       fill: 'rgba(0, 0, 0, 0.25)',
+      //fill: 'rgba(0, 0, 0, 0.50)',
       stroke: 'none'
     });
 
@@ -621,7 +632,48 @@ function initializeClock(svg, settings) {
       cy: SVG_CONFIG.center.y,
       r: backgroundRadius,
       //fill: 'black',
+      //fill: 'white',
+      fill: 'gray',
+      stroke: 'none'
+    });
+    svg.appendChild(circle);
+  }
+
+  function drawBackgroundCircleMinute() {
+    const backgroundRadius = CLOCK_RADII.minute;
+    const circle = createSVGElement('circle', {
+      cx: SVG_CONFIG.center.x,
+      cy: SVG_CONFIG.center.y,
+      r: backgroundRadius,
+      //fill: 'black',
+      fill: '#6db6ff',
+      stroke: 'none'
+    });
+    svg.appendChild(circle);
+  }
+
+  function drawBackgroundCircleHour24() {
+    const backgroundRadius = CLOCK_RADII.hour24;
+    const circle = createSVGElement('circle', {
+      cx: SVG_CONFIG.center.x,
+      cy: SVG_CONFIG.center.y,
+      r: backgroundRadius,
+      //fill: 'black',
+      //fill: 'gray',
       fill: 'white',
+      stroke: 'none'
+    });
+    svg.appendChild(circle);
+  }
+
+  function drawBackgroundCircleHour12() {
+    const backgroundRadius = CLOCK_RADII.hour12;
+    const circle = createSVGElement('circle', {
+      cx: SVG_CONFIG.center.x,
+      cy: SVG_CONFIG.center.y,
+      r: backgroundRadius,
+      //fill: 'black',
+      fill: '#b66dff',
       stroke: 'none'
     });
     svg.appendChild(circle);
@@ -630,6 +682,9 @@ function initializeClock(svg, settings) {
   // Initialize clock
   initializeArrowhead();
   drawBackgroundCircle();  // Draw background first (behind everything)
+  drawBackgroundCircleMinute();
+  drawBackgroundCircleHour24();
+  drawBackgroundCircleHour12();
   drawDiameterLines();
   drawNighttimeBackground();  // Draw nighttime background before circles
   drawTimeCircles();

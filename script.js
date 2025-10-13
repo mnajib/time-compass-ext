@@ -661,6 +661,7 @@ function initializeClock(svg, settings) {
   function drawCompassDirections() {
     // Only draw if the setting is enabled
     if (!showCompassDirections) {
+      drawBranding();
       return;
     }
 
@@ -839,6 +840,41 @@ function initializeClock(svg, settings) {
     svg.appendChild(circle);
   }
 
+  function drawBranding() {
+    const { x: centerX, y: centerY } = SVG_CONFIG.center;
+
+    // Position the branding below the center circle (adjust 120 as needed)
+    const brandingY = centerY + COMPASS_CONFIG.centerCircle + 50;
+
+    // Main brand name
+    const brandText = createSVGElement('text', {
+        x: centerX,
+        y: brandingY,
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        'font-size': '20',
+        'font-weight': 'bold',
+        fill: '#000000', // Black color, change as needed
+        class: 'brand-text'
+    });
+    //brandText.textContent = 'NJB1337';
+    brandText.textContent = 'MNAJIB';
+    svg.appendChild(brandText);
+
+    // "Made in Malaysia" text
+    const madeInText = createSVGElement('text', {
+        x: centerX,
+        y: brandingY + 25, // Position below main brand
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        'font-size': '14',
+        fill: '#333333', // Dark gray color
+        class: 'brand-subtext'
+    });
+    madeInText.textContent = 'Made in Malaysia';
+    svg.appendChild(madeInText);
+  }
+
   // Initialize clock
   //initializeArrowhead();
   //initializeArrowheads();
@@ -852,6 +888,7 @@ function initializeClock(svg, settings) {
   drawTicks();
   drawCompassDirections();
   drawCenterCircle();
+  //drawBranding();
 
   // Start the clocks
   updateDigitalClock();

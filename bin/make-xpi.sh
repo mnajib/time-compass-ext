@@ -45,7 +45,7 @@ f_get_zip_args() {
   printf -- "-x"        # exclude pattern flag
   printf ' '
   #printf -- ".git/* dist/*" # exclude git and dist dirs
-  printf -- ".git/* .gitignore dist/* bin/* .direnv/*" # exclude bin, git and dist dirs
+  printf -- ".git/* .gitignore dist/* bin/* .direnv/* tmp/*"
 }
 
 ## ───────────────────────────── IMPURE FUNCTIONS ─────────────────────────── ##

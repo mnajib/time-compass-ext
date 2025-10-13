@@ -648,7 +648,8 @@ function initializeClock(svg, settings) {
       r: backgroundRadius,
       //fill: 'black',
       //fill: '#6db6ff',
-      fill: '#b5dafe',
+      //fill: '#b5dafe',
+      fill: '#d1e9ff',
       stroke: 'none'
     });
     svg.appendChild(circle);

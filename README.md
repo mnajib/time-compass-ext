@@ -2,7 +2,7 @@
 
 A Firefox extension that provides a unique multilingual time visualization combining analog and digital clocks with compass directions in Arabic, Malay, and English.
 
-![Screenshot](https://github.com/mnajib/time-compass-ext/raw/master/Screenshot_Time_Compass.png)
+![Screenshot](https://github.com/mnajib/time-compass-ext/raw/master/Screenshot-2_Time_Compass.png)
 
 ## Features
 

@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       show12Hour: true,
       show24Hour: true,
+      showCompassDirections: true,
       timezone: 'auto'
     },
     (items) => {
@@ -25,15 +26,18 @@ function initializeSettings() {
   const settingsPanel = document.querySelector('.settings-panel');
   const show12HourToggle = document.getElementById('show12Hour');
   const show24HourToggle = document.getElementById('show24Hour');
+  const showCompassDirectionsToggle = document.getElementById('showCompassDirections');
 
-  if (settingsBtn && settingsPanel && show12HourToggle && show24HourToggle) {
+  if (settingsBtn && settingsPanel && show12HourToggle && show24HourToggle && showCompassDirectionsToggle) {
     // Initialize toggles with stored values
     browser.storage.local.get({
       show12Hour: true,
-      show24Hour: true
+      show24Hour: true,
+      showCompassDirections: true
     }, (items) => {
       show12HourToggle.checked = items.show12Hour;
       show24HourToggle.checked = items.show24Hour;
+      showCompassDirectionsToggle.checked = items.showCompassDirections;
     });
     settingsBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -47,39 +51,50 @@ function initializeSettings() {
       }
     });
 
+    // Helper function to redraw the clock
+    const redrawClock = () => {
+      const svg = document.getElementById('clockSvg');
+      if (svg) {
+        // Clear existing content
+        while (svg.firstChild) {
+          svg.removeChild(svg.firstChild);
+        }
+        // Reinitialize with new settings
+        initializeClock(svg, {
+          show12Hour: show12HourToggle.checked,
+          show24Hour: show24HourToggle.checked,
+          showCompassDirections: showCompassDirectionsToggle.checked,
+          timezone: 'auto'
+        });
+      }
+    };
+
+    // Event listener for 12Hour toggle
     show12HourToggle.addEventListener('change', (e) => {
       e.stopPropagation();
       const show12Hour = e.target.checked;
       browser.storage.local.set({ show12Hour });
-      // Find the SVG and update it
-      const svg = document.getElementById('clockSvg');
-      if (svg) {
-        // Clear existing content
-        while (svg.firstChild) {
-          svg.removeChild(svg.firstChild);
-        }
-        // Reinitialize with new settings
-        initializeClock(svg, { show12Hour, show24Hour: show24HourToggle.checked, timezone: 'auto' });
-      }
+      redrawClock();
     });
 
+    // Event listener for 24Hour toggle
     show24HourToggle.addEventListener('change', (e) => {
       e.stopPropagation();
       const show24Hour = e.target.checked;
       browser.storage.local.set({ show24Hour });
-      // Find the SVG and update it
-      const svg = document.getElementById('clockSvg');
-      if (svg) {
-        // Clear existing content
-        while (svg.firstChild) {
-          svg.removeChild(svg.firstChild);
-        }
-        // Reinitialize with new settings
-        initializeClock(svg, { show12Hour: show12HourToggle.checked, show24Hour, timezone: 'auto' });
-      }
+      redrawClock();
     });
+
+    // Event listener for Compass Directions toggle
+    showCompassDirectionsToggle.addEventListener('change', (e) => {
+      e.stopPropagation();
+      const showCompassDirections = e.target.checked;
+      browser.storage.local.set({ showCompassDirections });
+      redrawClock();
+    });
+
   }
-}
+} // End of initializeSettings() { ... }
 
 // Compass and Clock Configuration
 const COMPASS_CONFIG = {
@@ -130,8 +145,7 @@ function initializeClock(svg, settings) {
     minute: 280 + 70 + 70
   };
 
-/* NOTE: This is copied here for temporary ref
-
+  /* NOTE: This is copied here for temporary ref
     if (show12Hour) {
       drawHand(angles.hour12, CLOCK_RADII.hour12 - 35, CLOCK_HANDS.hour12, 'hour12');
     }
@@ -140,7 +154,7 @@ function initializeClock(svg, settings) {
     }
     drawHand(angles.minute, CLOCK_RADII.minute - 20, CLOCK_HANDS.minute, 'minute');
     drawHand(angles.second, CLOCK_RADII.minute - 15, CLOCK_HANDS.second, 'second');
-*/
+  */
 
   // Clock hands configuration
   const CLOCK_HANDS = {
@@ -152,6 +166,7 @@ function initializeClock(svg, settings) {
 
   let show12Hour = settings.show12Hour;
   let show24Hour = settings.show24Hour;
+  let showCompassDirections = settings.showCompassDirections;
   let timezone = settings.timezone;
 
   // SVG Element Creation Utilities
@@ -234,9 +249,9 @@ function initializeClock(svg, settings) {
     }
 }
 
-//---------------------------------------------------------
-// Subject to deletion
-//---------------------------------------------------------
+  //---------------------------------------------------------
+  // Subject to deletion
+  //---------------------------------------------------------
   // Create and append arrowhead marker
   function initializeArrowhead() {
     const marker = createSVGElement('marker', {
@@ -260,7 +275,7 @@ function initializeClock(svg, settings) {
     defs.appendChild(marker);
     svg.insertBefore(defs, svg.firstChild);
   }
-//---------------------------------------------------------
+  //---------------------------------------------------------
 
   function drawTimeCircles() {
     const circles = [
@@ -639,6 +654,11 @@ function initializeClock(svg, settings) {
 
   // Draw compass directions
   function drawCompassDirections() {
+    // Only draw if the setting is enabled
+    if (!showCompassDirections) {
+      return;
+    }
+
     COMPASS_DIRECTIONS.forEach(([angle, arab, malay, eng, deg]) => {
       const radian = (angle - 90) * Math.PI / 180;
       const x = SVG_CONFIG.center.x + Math.cos(radian) * COMPASS_CONFIG.labelRadius;

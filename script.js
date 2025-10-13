@@ -584,7 +584,8 @@ function initializeClock(svg, settings) {
         //stroke: 'red',
         stroke: 'black',
         //'stroke-width': isMainTick ? '2' : '1'
-        'stroke-width': isMainTick ? '8' : '4'
+        //'stroke-width': isMainTick ? '8' : '4'
+        'stroke-width': isMainTick ? '8' : '8'
       });
       svg.appendChild(tick);
     }

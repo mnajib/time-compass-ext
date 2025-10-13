@@ -118,13 +118,15 @@
       font-family: 'JetBrains Mono';
       src: local('JetBrains Mono');
     }
-    
+
     svg text {
       font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
     }
   </style>
 </head>
+
 <body>
+
   <!-- Settings Panel -->
   <button class="settings-btn">⚙️ Settings</button>
   <div class="settings-panel">
@@ -146,272 +148,14 @@
   </div>
 
   <div class="container">
-
-<!-- Clock SVG -->
-<svg id="clockSvg" xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
-  <defs>
-    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="2.5" orient="auto-start-reverse">
-      <path d="M0,0 L5,2.5 L0,5 Z" fill="black"/>
-    </marker>
-  </defs>
-        radius: 200,                    // Base compass circle radius
-        lineDiagonal: 212,             // Length of diagonal lines
-        centerCircle: 90,              // Central white circle radius
-        labelRadius: 180,              // Distance of direction labels from center
-        textBlock: {
-            lineSpacing: 20,           // Vertical space between text lines
-            totalLines: 4              // Number of text lines per direction
-        }
-    });
-
-    /**
-     * Initialization Sequence:
-     * 1. Draw base circles and lines
-     * 2. Add compass directions
-     * 3. Add tick marks
-     * 4. Initialize digital clock
-     * 5. Start clock animation
-     */
-
-    /**
-     * SVG Element Creation Utilities
-     * Pure functions that return immutable SVG element specifications
-     */
-
-    /**
-     * Creates a circle element specification
-     * @param {number} cx - Center X coordinate
-     * @param {number} cy - Center Y coordinate
-     * @param {number} r - Radius
-     * @param {string} stroke - Stroke color
-     * @param {number} strokeWidth - Stroke width
-     * @param {string} [fill="none"] - Fill color
-     * @returns {Object} Immutable circle specification
-     */
-    const createCircle = (cx, cy, r, stroke, strokeWidth, fill="none") =>
-        Object.freeze({
-            el: "circle",
-            attrs: Object.freeze({ cx, cy, r, stroke, "stroke-width": strokeWidth, fill })
-        });
-
-    /**
-     * Creates a line element specification
-     * @param {number} x1 - Start X coordinate
-     * @param {number} y1 - Start Y coordinate
-     * @param {number} x2 - End X coordinate
-     * @param {number} y2 - End Y coordinate
-     * @param {string} [stroke="black"] - Line color
-     * @param {number} [width=1] - Line width
-     * @param {string} [dash=null] - Dash pattern
-     * @returns {Object} Immutable line specification
-     */
-    const createLine = (x1, y1, x2, y2, stroke="black", width=1, dash=null) => {
-        const baseAttrs = { x1, y1, x2, y2, stroke, "stroke-width": width };
-        const attrs = dash
-            ? { ...baseAttrs, "stroke-dasharray": dash }
-            : baseAttrs;
-        return Object.freeze({ el: "line", attrs: Object.freeze(attrs) });
-    };
-
-    /**
-     * Creates an arrow line element specification
-     * @param {number} x1 - Start X coordinate
-     * @param {number} y1 - Start Y coordinate
-     * @param {number} x2 - End X coordinate
-     * @param {number} y2 - End Y coordinate
-     * @param {string} [stroke="black"] - Arrow color
-     * @param {number} [width=3] - Arrow width
-     * @returns {Object} Immutable arrow specification
-     */
-    const createArrow = (x1, y1, x2, y2, stroke="black", width=3) =>
-        Object.freeze({
-            el: "line",
-            attrs: Object.freeze({
-                x1, y1, x2, y2,
-                stroke,
-                "stroke-width": width,
-                "marker-end": "url(#arrowhead)"
-            })
-        });
-
-    /**
-     * Creates a text element specification with RTL support
-     * @param {number} x - X coordinate
-     * @param {number} y - Y coordinate
-     * @param {string} txt - Text content
-     * @param {Object} [opts={}] - Text options
-     * @param {number} [opts.size=12] - Font size
-     * @param {string} [opts.color="black"] - Text color
-     * @param {string} [opts.weight] - Font weight
-     * @param {string} [opts.style] - Font style
-     * @param {string} [opts.lang] - Language (use "arab" for RTL)
-     * @returns {Object} Immutable text specification
-     */
-    const createText = (x, y, txt, opts={}) => {
-        const attrs = {
-            x, y,
-            "text-anchor": "middle",
-            "font-size": opts.size || 12,
-            fill: opts.color || "black",
-            ...(opts.weight && { "font-weight": opts.weight }),
-            ...(opts.style && { "font-style": opts.style }),
-            ...(opts.lang === "arab" && { direction: "rtl" })
-        };
-        return Object.freeze({ el: "text", attrs: Object.freeze(attrs), txt });
-    };
-
-    /**
-     * Renders an SVG element specification to the DOM
-     * @param {Object} param0 - Element specification
-     * @param {string} param0.el - Element type
-     * @param {Object} param0.attrs - Element attributes
-     * @param {string} [param0.txt] - Text content
-     * @returns {SVGElement} The created DOM element
-     */
-    const render = ({el, attrs, txt}) => {
-        const node = document.createElementNS("http://www.w3.org/2000/svg", el);
-        Object.entries(attrs).forEach(([k,v]) => node.setAttribute(k, v));
-        if (txt) node.textContent = txt;
-        svg.appendChild(node);
-        return node;
-    };
-
-    const drawDiameterLines = () => {
-      const offset = CLOCK_RADII.minute;
-      const { x, y } = SVG_CONFIG.center;
-      render(createLine(x - offset, y, x + offset, y, "gray", 1, "4 2"));
-      render(createLine(x, y - offset, x, y + offset, "gray", 1, "4 2"));
-      const diagOffset = offset / Math.sqrt(2);
-      render(createLine(x - diagOffset, y - diagOffset, x + diagOffset, y + diagOffset, "gray", 1, "4 2"));
-      render(createLine(x - diagOffset, y + diagOffset, x + diagOffset, y - diagOffset, "gray", 1, "4 2"));
-    };
-
-    const drawTimeCircles = () => {
-      const timeCircles = [
-        { radius: CLOCK_RADII.minute, color: "blue" },
-        { radius: CLOCK_RADII.hour24, color: "red" },
-        { radius: CLOCK_RADII.hour12, color: "green" }
-      ];
-      timeCircles.forEach(c => render(createCircle(SVG_CONFIG.center.x, SVG_CONFIG.center.y, c.radius, c.color, 1)));
-    };
-
-    // Initialize arrowhead marker for clock hands
-    const initializeArrowhead = () => {
-        const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
-        marker.setAttribute("id", "arrowhead");
-        marker.setAttribute("markerWidth", "10");
-        marker.setAttribute("markerHeight", "10");
-        marker.setAttribute("refX", "5");
-        marker.setAttribute("refY", "2.5");
-        marker.setAttribute("orient", "auto-start-reverse");
-        const arrowPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        arrowPath.setAttribute("d", "M0,0 L5,2.5 L0,5 Z");
-        arrowPath.setAttribute("fill", "black");
-        marker.appendChild(arrowPath);
-        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-        defs.appendChild(marker);
-        svg.insertBefore(defs, svg.firstChild);
-    };
-
-    // Draw in correct order
-    initializeArrowhead();
-    drawTimeCircles();
-    drawDiameterLines();
-
-    /**
-     * Compass Direction Configuration
-     * Defines the structure and style of direction labels
-     */
-    const DIRECTION_STYLE = Object.freeze({
-        arabic: { size: 22, lang: "arab" },
-        malay: { size: 22, weight: "700" },
-        english: { size: 18, style: "italic" },
-        degree: { size: 12 }
-    });
-
-    /**
-     * Converts degrees to radians and adjusts for SVG coordinate system
-     * @param {number} degrees - Angle in degrees
-     * @returns {number} Angle in radians, adjusted for SVG
-     */
-    const degreesToSVGRadians = degrees => (degrees - 90) * Math.PI / 180;
-
-    /**
-     * Calculates position on the compass circle
-     * @param {number} angle - Angle in radians
-     * @param {number} radius - Distance from center
-     * @returns {Object} Coordinates {x, y}
-     */
-    const getPointOnCircle = (angle, radius) => ({
-        x: SVG_CONFIG.center.x + radius * Math.cos(angle),
-        y: SVG_CONFIG.center.y + radius * Math.sin(angle)
-    });
-
-    /**
-     * Renders a direction label set at the specified angle
-     * @param {number} angleDeg - Angle in degrees
-     * @param {string} arab - Arabic direction text
-     * @param {string} bm - Bahasa Melayu direction text
-     * @param {string} en - English direction text
-     * @param {number} deg - Degree value to display
-     */
-    const addDirection = (angleDeg, arab, bm, en, deg) => {
-        const angle = degreesToSVGRadians(angleDeg);
-        const position = getPointOnCircle(angle, COMPASS_CONFIG.labelRadius);
-
-        // Calculate vertical spacing for the text block
-        const totalHeight = COMPASS_CONFIG.textBlock.lineSpacing * 3;
-        const baseY = position.y - totalHeight/2;
-
-        // Create text elements with consistent spacing and styling
-        const directionTexts = [
-            { text: arab, style: DIRECTION_STYLE.arabic, offset: 0 },
-            { text: bm, style: DIRECTION_STYLE.malay, offset: 1 },
-            { text: en, style: DIRECTION_STYLE.english, offset: 2 },
-            { text: deg + "°", style: DIRECTION_STYLE.degree, offset: 3 }
-        ].map(({ text, style, offset }) =>
-            createText(
-                position.x,
-                baseY + COMPASS_CONFIG.textBlock.lineSpacing * offset,
-                text,
-                style
-            )
-        );
-
-        // Render all elements in the text block
-        directionTexts.forEach(render);
-    };
-
-    /**
-     * Compass Direction Data
-     * Array of [angle, Arabic, Malay, English, degree] for each direction
-     */
-    const COMPASS_DIRECTIONS = Object.freeze([
-        [0, "شَمَال", "Utara", "North", 0],
-        [90, "شَرْق", "Timur", "East", 90],
-        [180, "جَنُوب", "Selatan", "South", 180],
-        [270, "غَرْب", "Barat", "West", 270],
-        [45, "شَمَال شَرْق", "Timur Laut", "Northeast", 45],
-        [135, "جَنُوب شَرْق", "Tenggara", "Southeast", 135],
-        [225, "جَنُوب غَرْب", "Barat Daya", "Southwest", 225],
-        [315, "شَمَال غَرْب", "Barat Laut", "Northwest", 315]
-    ]);
-
-    // Render all compass directions
-    COMPASS_DIRECTIONS.forEach(args => addDirection(...args));
-
-    // Draw center white circle
-    render(createCircle(
-        SVG_CONFIG.center.x,
-        SVG_CONFIG.center.y,
-        COMPASS_CONFIG.centerCircle,
-        "black",
-        2,
-        "white"
-</svg>
-<!-- Load the extension script -->
-<script src="script.js"></script>
-
+    <!-- Empty SVG container; JavaScript will populate this -->
+    <!-- Clock SVG -->
+    <svg id="clockSvg" xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+      <!-- JavaScript will create all elements here -->
+    </svg>
+    <!-- Load the extension script -->
+    <script src="script.js"></script>
   </div>
+
 </body>
 </html>

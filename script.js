@@ -590,21 +590,23 @@ function initializeClock(svg, settings) {
     }
 
     // 12-hour ticks
-    for (let i = 0; i < 12; i++) {
-      const angle = (i / 12) * 2 * Math.PI - Math.PI / 2;
-      const length = 10;
+    if (show12Hour) {
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * 2 * Math.PI - Math.PI / 2;
+        const length = 10;
 
-      const x1 = SVG_CONFIG.center.x + Math.cos(angle) * CLOCK_RADII.hour12;
-      const y1 = SVG_CONFIG.center.y + Math.sin(angle) * CLOCK_RADII.hour12;
-      const x2 = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour12 - length);
-      const y2 = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour12 - length);
+        const x1 = SVG_CONFIG.center.x + Math.cos(angle) * CLOCK_RADII.hour12;
+        const y1 = SVG_CONFIG.center.y + Math.sin(angle) * CLOCK_RADII.hour12;
+        const x2 = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour12 - length);
+        const y2 = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour12 - length);
 
-      const tick = createSVGElement('line', {
-        x1, y1, x2, y2,
-        stroke: 'green',
-        'stroke-width': '2'
-      });
-      svg.appendChild(tick);
+        const tick = createSVGElement('line', {
+          x1, y1, x2, y2,
+          stroke: 'green',
+          'stroke-width': '2'
+        });
+        svg.appendChild(tick);
+      }
     }
 
     // 24-hour numbers
@@ -633,24 +635,27 @@ function initializeClock(svg, settings) {
     }
 
     // 12-hour numbers
-    for (let i = 1; i <= 12; i++) {
-      const angle = ((i - 3) / 12) * 2 * Math.PI;
-      const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour12 - 25);
-      const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour12 - 25);
+    if (show12Hour) {
+      for (let i = 1; i <= 12; i++) {
+        const angle = ((i - 3) / 12) * 2 * Math.PI;
+        const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour12 - 25);
+        const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour12 - 25);
 
-      const text = createSVGElement('text', {
-        x, y,
-        'text-anchor': 'middle',
-        'dominant-baseline': 'middle',
-        //'font-size': '18',
-        'font-size': '32',
-        fill: 'green',
-        'font-weight': 'bold'
-      });
-      text.textContent = i;
-      svg.appendChild(text);
+        const text = createSVGElement('text', {
+          x, y,
+          'text-anchor': 'middle',
+          'dominant-baseline': 'middle',
+          //'font-size': '18',
+          'font-size': '32',
+          fill: 'green',
+          'font-weight': 'bold'
+        });
+        text.textContent = i;
+        svg.appendChild(text);
+      }
     }
-  }
+
+  } // End of function drawTicks() { ... }
 
   // Draw compass directions
   function drawCompassDirections() {

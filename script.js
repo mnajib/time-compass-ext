@@ -130,14 +130,23 @@ function initializeClock(svg, settings) {
     minute: 280 + 70 + 70
   };
 
+/* NOTE: This is copied here for temporary ref
+
+    if (show12Hour) {
+      drawHand(angles.hour12, CLOCK_RADII.hour12 - 35, CLOCK_HANDS.hour12, 'hour12');
+    }
+    if (show24Hour) {
+      drawHand(angles.hour24, CLOCK_RADII.hour24 - 40, CLOCK_HANDS.hour24, 'hour24');
+    }
+    drawHand(angles.minute, CLOCK_RADII.minute - 20, CLOCK_HANDS.minute, 'minute');
+    drawHand(angles.second, CLOCK_RADII.minute - 15, CLOCK_HANDS.second, 'second');
+*/
+
   // Clock hands configuration
   const CLOCK_HANDS = {
-    //hour12: { color: "green", width: 5 },
-    //hour24: { color: "red", width: 5 },
+    hour24: { color: "red", width: 9 },
     hour12: { color: "green", width: 7 },
-    //hour24: { color: "red", width: 8 },
-    hour24: { color: "black", width: 8 },
-    minute: { color: "blue", width: 4 },
+    minute: { color: "blue", width: 5 },
     second: { color: "purple", width: 3 }
   };
 
@@ -154,6 +163,80 @@ function initializeClock(svg, settings) {
     return el;
   }
 
+  //
+  //    id: 'arrowheadMinute', color: 'blue', fillcolor: 'none'
+  //    id: 'arrowheadSecond', color: 'purple, fillcolor: 'none'
+  //    id: 'arrowheadHour24', color: 'red', fillcolor: 'none'
+  //    id: 'arrowheadHour12', color: 'green', fillcolor: 'none'
+  //
+
+  function initializeArrowheads() {
+    const defs = createSVGElement('defs');
+
+    const arrowheadConfigs = [
+        {
+            id: 'arrowheadMinute',
+            color: CLOCK_HANDS.minute.color,
+            fillcolor: 'none',
+            path: 'M0,0 L5,2.5 L0,5 Z',
+            size: { width: 8, height: 8, refX: 5, refY: 2.5 }
+        },
+        {
+            id: 'arrowheadSecond',
+            color: CLOCK_HANDS.second.color,
+            fillcolor: 'none',
+            path: 'M0,1 L4,2.5 L0,4 L1,2.5 Z', // Diamond shape
+            size: { width: 6, height: 6, refX: 4, refY: 2.5 }
+        },
+        {
+            id: 'arrowheadHour24',
+            color: CLOCK_HANDS.hour24.color,
+            fillcolor: 'rgba(255,0,0,0.2)',
+            path: 'M0,0 L6,3 L0,6 Z',
+            size: { width: 10, height: 10, refX: 6, refY: 3 }
+        },
+        {
+            id: 'arrowheadHour12',
+            color: CLOCK_HANDS.hour12.color,
+            fillcolor: 'rgba(0,255,0,0.2)',
+            path: 'M0,0 L6,3 L0,6 Z',
+            size: { width: 10, height: 10, refX: 6, refY: 3 }
+        }
+    ];
+
+    arrowheadConfigs.forEach(config => {
+        const marker = createSVGElement('marker', {
+            id: config.id,
+            markerWidth: config.size.width,
+            markerHeight: config.size.height,
+            refX: config.size.refX,
+            refY: config.size.refY,
+            orient: 'auto-start-reverse'
+        });
+
+        const path = createSVGElement('path', {
+            d: config.path,
+            fill: config.fillcolor,
+            stroke: config.color,
+            'stroke-width': 1
+        });
+
+        marker.appendChild(path);
+        defs.appendChild(marker);
+    });
+
+    // Replace existing defs or add new ones
+    const existingDefs = svg.querySelector('defs');
+    if (existingDefs) {
+        svg.replaceChild(defs, existingDefs);
+    } else {
+        svg.insertBefore(defs, svg.firstChild);
+    }
+}
+
+//---------------------------------------------------------
+// Subject to deletion
+//---------------------------------------------------------
   // Create and append arrowhead marker
   function initializeArrowhead() {
     const marker = createSVGElement('marker', {
@@ -177,6 +260,7 @@ function initializeClock(svg, settings) {
     defs.appendChild(marker);
     svg.insertBefore(defs, svg.firstChild);
   }
+//---------------------------------------------------------
 
   function drawTimeCircles() {
     const circles = [
@@ -203,6 +287,10 @@ function initializeClock(svg, settings) {
     });
   }
 
+//---------------------------------------------------------
+// Subject to deletion
+//---------------------------------------------------------
+/*
   function drawClockHands() {
     const now = getCurrentTime();
     const angles = calculateClockAngles(now);
@@ -242,6 +330,48 @@ function initializeClock(svg, settings) {
       class: 'clock-hand'
     });
     svg.appendChild(hand);
+  }
+*/
+//---------------------------------------------------------
+
+  function drawHand(angle, length, style, handType) {
+    const { x: centerX, y: centerY } = SVG_CONFIG.center;
+    const startX = centerX + Math.cos(angle) * 90; // Inner circle radius
+    const startY = centerY + Math.sin(angle) * 90;
+    const endX = centerX + Math.cos(angle) * length;
+    const endY = centerY + Math.sin(angle) * length;
+
+    // Determine which arrowhead marker to use based on handType
+    const markerId = `arrowhead${handType.charAt(0).toUpperCase() + handType.slice(1)}`;
+
+    const hand = createSVGElement('line', {
+      x1: startX,
+      y1: startY,
+      x2: endX,
+      y2: endY,
+      stroke: style.color,
+      'stroke-width': style.width,
+      'marker-end': `url(#${markerId})`,
+      class: 'clock-hand'
+    });
+    svg.appendChild(hand);
+  }
+
+  function drawClockHands() {
+    const now = getCurrentTime();
+    const angles = calculateClockAngles(now);
+
+    // Remove previous hands
+    Array.from(svg.querySelectorAll('.clock-hand')).forEach(hand => hand.remove());
+
+    if (show12Hour) {
+      drawHand(angles.hour12, CLOCK_RADII.hour12 - 35, CLOCK_HANDS.hour12, 'hour12');
+    }
+    if (show24Hour) {
+      drawHand(angles.hour24, CLOCK_RADII.hour24 - 40, CLOCK_HANDS.hour24, 'hour24');
+    }
+    drawHand(angles.minute, CLOCK_RADII.minute - 20, CLOCK_HANDS.minute, 'minute');
+    drawHand(angles.second, CLOCK_RADII.minute - 15, CLOCK_HANDS.second, 'second');
   }
 
   function calculateClockAngles(now) {
@@ -685,7 +815,8 @@ function initializeClock(svg, settings) {
   }
 
   // Initialize clock
-  initializeArrowhead();
+  //initializeArrowhead();
+  //initializeArrowheads();
   drawBackgroundCircle();  // Draw background first (behind everything)
   drawBackgroundCircleMinute();
   drawBackgroundCircleHour24();

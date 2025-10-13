@@ -47,9 +47,9 @@ To work on this extension locally:
    ```bash
    git clone https://github.com/mnajib/time-compass-ext.git
    ```
-2. Open Firefox and navigate to `about:debugging`
+2. Open Firefox and navigate to `about:debugging` in address bar
 3. Click "This Firefox" > "Load Temporary Add-on"
-4. Select any file in the extension directory
+4. Select the manifest.json file in the extension's root directory
 
 ## Upcoming Features
 

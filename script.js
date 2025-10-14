@@ -278,6 +278,7 @@ function initializeClock(svg, settings) {
   //---------------------------------------------------------
 
   function drawTimeCircles() {
+    /*
     const circles = [
       { radius: CLOCK_RADII.minute, color: "blue", strokewidth: '1', fillcolor: 'none' },
       //{ radius: CLOCK_RADII.minute, color: "blue", strokewidth: '1', fillcolor: '#dddddd' },
@@ -300,6 +301,42 @@ function initializeClock(svg, settings) {
       });
       svg.appendChild(circle);
     });
+    */
+
+    const circleMinute = createSVGElement('circle', {
+      cx: SVG_CONFIG.center.x,
+      cy: SVG_CONFIG.center.y,
+      r: CLOCK_RADII.minute,
+      stroke: "blue",
+      'stroke-width': '1',
+      fill: 'none'
+    });
+    svg.appendChild(circleMinute);
+
+    if (show24Hour) {
+      const circle24Hours = createSVGElement('circle', {
+        cx: SVG_CONFIG.center.x,
+        cy: SVG_CONFIG.center.y,
+        r: CLOCK_RADII.hour24,
+        stroke: "black",
+        'stroke-width': '5',
+        fill: 'none'
+      });
+      svg.appendChild(circle24Hours);
+    }
+
+    if (show12Hour) {
+      const circle12Hours = createSVGElement('circle', {
+        cx: SVG_CONFIG.center.x,
+        cy: SVG_CONFIG.center.y,
+        r: CLOCK_RADII.hour12,
+        stroke: "green",
+        'stroke-width': '1',
+        fill: 'none'
+      });
+      svg.appendChild(circle12Hours);
+    }
+
   }
 
 //---------------------------------------------------------
@@ -568,26 +605,28 @@ function initializeClock(svg, settings) {
     }
 
     // 24-hour ticks
-    for (let i = 0; i < 24; i++) {
-      const angle = (i / 24) * 2 * Math.PI - Math.PI / 2;
-      const isMainTick = i % 3 === 0;
-      //const length = isMainTick ? 12 : 8;
-      const length = isMainTick ? 12 : 12;
+    if (show24Hour) {
+      for (let i = 0; i < 24; i++) {
+        const angle = (i / 24) * 2 * Math.PI - Math.PI / 2;
+        const isMainTick = i % 3 === 0;
+        //const length = isMainTick ? 12 : 8;
+        const length = isMainTick ? 12 : 12;
 
-      const x1 = SVG_CONFIG.center.x + Math.cos(angle) * CLOCK_RADII.hour24;
-      const y1 = SVG_CONFIG.center.y + Math.sin(angle) * CLOCK_RADII.hour24;
-      const x2 = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - length);
-      const y2 = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - length);
+        const x1 = SVG_CONFIG.center.x + Math.cos(angle) * CLOCK_RADII.hour24;
+        const y1 = SVG_CONFIG.center.y + Math.sin(angle) * CLOCK_RADII.hour24;
+        const x2 = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - length);
+        const y2 = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - length);
 
-      const tick = createSVGElement('line', {
-        x1, y1, x2, y2,
-        //stroke: 'red',
-        stroke: 'black',
-        //'stroke-width': isMainTick ? '2' : '1'
-        //'stroke-width': isMainTick ? '8' : '4'
-        'stroke-width': isMainTick ? '8' : '8'
-      });
-      svg.appendChild(tick);
+        const tick = createSVGElement('line', {
+          x1, y1, x2, y2,
+          //stroke: 'red',
+          stroke: 'black',
+          //'stroke-width': isMainTick ? '2' : '1'
+          //'stroke-width': isMainTick ? '8' : '4'
+          'stroke-width': isMainTick ? '8' : '8'
+        });
+        svg.appendChild(tick);
+      }
     }
 
     // 12-hour ticks
@@ -611,27 +650,29 @@ function initializeClock(svg, settings) {
     }
 
     // 24-hour numbers
-    for (let i = 0; i < 24; i++) {
-      if (i % 3 === 0) { // Show every 3 hours
-        const angle = (i / 24) * 2 * Math.PI - Math.PI / 2;
-        //const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - 20);
-        //const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - 20);
-        const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - 35);
-        const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - 35);
+    if (show24Hour) {
+      for (let i = 0; i < 24; i++) {
+        if (i % 3 === 0) { // Show every 3 hours
+          const angle = (i / 24) * 2 * Math.PI - Math.PI / 2;
+          //const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - 20);
+          //const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - 20);
+          const x = SVG_CONFIG.center.x + Math.cos(angle) * (CLOCK_RADII.hour24 - 35);
+          const y = SVG_CONFIG.center.y + Math.sin(angle) * (CLOCK_RADII.hour24 - 35);
 
-        const text = createSVGElement('text', {
-          x, y,
-          'text-anchor': 'middle',
-          'dominant-baseline': 'middle',
-          //'font-size': '16',
-          //'font-size': '48',
-          'font-size': '35',
-          //fill: 'red',
-          fill: 'black',
-          'font-weight': 'bold'
-        });
-        text.textContent = i === 0 ? '24' : i;
-        svg.appendChild(text);
+          const text = createSVGElement('text', {
+            x, y,
+            'text-anchor': 'middle',
+            'dominant-baseline': 'middle',
+            //'font-size': '16',
+            //'font-size': '48',
+            'font-size': '35',
+            //fill: 'red',
+            fill: 'black',
+            'font-weight': 'bold'
+          });
+          text.textContent = i === 0 ? '24' : i;
+          svg.appendChild(text);
+        }
       }
     }
 
@@ -714,6 +755,7 @@ function initializeClock(svg, settings) {
     });
   }
 
+  /*
   // Draw nighttime background (18:00 to 06:00)
   function drawNighttimeBackground() {
     const { x: cx, y: cy } = SVG_CONFIG.center;
@@ -765,7 +807,43 @@ function initializeClock(svg, settings) {
       stroke: 'none'
     });
 
-    svg.appendChild(nightPath);
+    if (show24Hour) {
+      svg.appendChild(nightPath);
+    }
+  }
+  */
+
+  // Draw nighttime background (18:00 to 06:00)
+  function drawNighttimeBackground() {
+    const { x: cx, y: cy } = SVG_CONFIG.center;
+    const radius = CLOCK_RADII.hour24; // Use the outer radius for full half circle
+
+    // Calculate angles for 18:00 and 06:00 on 24-hour clock
+    const hour18Angle = (18 / 24) * 2 * Math.PI - Math.PI / 2; // 18:00
+    const hour06Angle = (6 / 24) * 2 * Math.PI - Math.PI / 2;  // 06:00
+
+    // Create path for the nighttime half circle
+    // We'll draw from 18:00 clockwise to 06:00 (covering 12 hours = 180 degrees)
+    const largeArcFlag = 1; // Use large arc since we're spanning 180+ degrees
+    const sweepFlag = 1;    // Clockwise direction
+
+    const pathData = [
+      `M ${cx} ${cy}`, // Move to center
+      `L ${cx + Math.cos(hour18Angle) * radius} ${cy + Math.sin(hour18Angle) * radius}`, // Line to 18:00 on circle
+      `A ${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${cx + Math.cos(hour06Angle) * radius} ${cy + Math.sin(hour06Angle) * radius}`, // Arc to 06:00
+      `Z` // Close path back to center
+    ].join(' ');
+
+    const nightPath = createSVGElement('path', {
+      d: pathData,
+      //fill: 'rgba(0, 0, 0, 0.25)',
+      fill: 'lightgray',
+      stroke: 'none'
+    });
+
+    if (show24Hour) {
+      svg.appendChild(nightPath);
+    }
   }
 
   // Draw center white circle
@@ -823,7 +901,9 @@ function initializeClock(svg, settings) {
       fill: 'white',
       stroke: 'none'
     });
-    svg.appendChild(circle);
+    if (show24Hour) {
+      svg.appendChild(circle);
+    }
   }
 
   function drawBackgroundCircleHour12() {
@@ -836,9 +916,12 @@ function initializeClock(svg, settings) {
       //fill: '#b66dff',
       //fill: '#71c0a7',
       fill: '#cae7d3',
+      //fill: 'green',
       stroke: 'none'
     });
-    svg.appendChild(circle);
+    if (show12Hour) {
+      svg.appendChild(circle);
+    }
   }
 
   function drawBranding() {
@@ -949,9 +1032,9 @@ function initializeClock(svg, settings) {
   drawBackgroundCircle();  // Draw background first (behind everything)
   drawBackgroundCircleMinute();
   drawBackgroundCircleHour24();
+  drawNighttimeBackground();  // Draw nighttime background before circles
   drawBackgroundCircleHour12();
   drawDiameterLines();
-  drawNighttimeBackground();  // Draw nighttime background before circles
   //drawSurahTranslation();
   drawTimeCircles();
   drawTicks();

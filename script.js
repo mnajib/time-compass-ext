@@ -859,7 +859,7 @@ function initializeClock(svg, settings) {
         class: 'brand-text'
     });
     //brandText.textContent = 'NJB1337';
-    brandText.textContent = 'MNAJIB';
+    brandText.textContent = 'NAJIB';
     svg.appendChild(brandText);
 
     // "Made in Malaysia" text

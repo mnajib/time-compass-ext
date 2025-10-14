@@ -876,6 +876,63 @@ function initializeClock(svg, settings) {
     svg.appendChild(madeInText);
   }
 
+  function drawSurahTranslation() {
+    const { x: centerX, y: centerY } = SVG_CONFIG.center;
+
+    // Position above the digital time - adjust -80 as needed
+    //const translationY = centerY - 80;
+
+    // Calculate vertical position: centered between inner circle top and green circle top
+    const innerCircleTop = centerY - COMPASS_CONFIG.centerCircle; // Top of digital clock circle
+    const greenCircleTop = centerY - CLOCK_RADII.hour12; // Top of green 12-hour circle
+    // Position at the midpoint between these two points
+    const translationY = (innerCircleTop + greenCircleTop) / 2;
+
+    // Create background rectangle
+    const backgroundRect = createSVGElement('rect', {
+        x: centerX - 150,  // Width of 300px
+        y: translationY - 40, // Height of 80px
+        width: 300,
+        height: 80,
+        rx: 15, // Rounded corners
+        // fill: 'rgba(255, 255, 255, 0.9)', // Semi-transparent white
+        fill: 'none', // Semi-transparent white
+        // stroke: '#4A90E2',
+        //'stroke-width': 2,
+        class: 'translation-box'
+    });
+    svg.appendChild(backgroundRect);
+
+    // Main translation text
+    const translationText = createSVGElement('text', {
+        x: centerX,
+        y: translationY,
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        'font-family': 'cursive, "Comic Sans MS", sans-serif', // Handwritten-style fallback
+        'font-size': '14',
+        //'font-weight': 'bold',
+        //fill: '#2C3E50',
+        //fill: '#2C3E50',
+        class: 'surah-translation'
+    });
+
+    // Add formatted text content
+    /*
+    translationText.innerHTML = `Surah Al-Ikhlas (The Sincerity)\n` +
+                               `"Say: He is Allah, the One and Only;\n` +
+                               `Allah, the Eternal, Absolute;\n` +
+                               `He begets not, nor is He begotten;\n` +
+                               `And there is none like unto Him."`;
+    */
+    translationText.innerHTML = `He is Allah, the One and Only;\n` +
+                               `Allah, the Eternal, Absolute;\n` +
+                               `He begets not, nor is He begotten;\n` +
+                               `And there is none like unto Him.`;
+
+    svg.appendChild(translationText);
+}
+
   // Initialize clock
   //initializeArrowhead();
   //initializeArrowheads();
@@ -885,6 +942,7 @@ function initializeClock(svg, settings) {
   drawBackgroundCircleHour12();
   drawDiameterLines();
   drawNighttimeBackground();  // Draw nighttime background before circles
+  drawSurahTranslation();
   drawTimeCircles();
   drawTicks();
   drawCompassDirections();

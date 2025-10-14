@@ -845,7 +845,12 @@ function initializeClock(svg, settings) {
     const { x: centerX, y: centerY } = SVG_CONFIG.center;
 
     // Position the branding below the center circle (adjust 120 as needed)
-    const brandingY = centerY + COMPASS_CONFIG.centerCircle + 50;
+    //const brandingY = centerY - 150;
+    const innerCircleTop = centerY - COMPASS_CONFIG.centerCircle; // Top of digital clock circle
+    const greenCircleTop = centerY - CLOCK_RADII.hour12; // Top of green 12-hour circle
+    const brandingY = ((innerCircleTop + greenCircleTop) / 2) + 15;
+    //const brandingY = centerY - CLOCK_RADII.hour12;
+    const madeinY = centerY + COMPASS_CONFIG.centerCircle + 90;
 
     // Main brand name
     const brandText = createSVGElement('text', {
@@ -853,7 +858,8 @@ function initializeClock(svg, settings) {
         y: brandingY,
         'text-anchor': 'middle',
         'dominant-baseline': 'middle',
-        'font-size': '20',
+        //'font-size': '20',
+        'font-size': '32',
         'font-weight': 'bold',
         fill: '#000000', // Black color, change as needed
         class: 'brand-text'
@@ -865,11 +871,15 @@ function initializeClock(svg, settings) {
     // "Made in Malaysia" text
     const madeInText = createSVGElement('text', {
         x: centerX,
-        y: brandingY + 25, // Position below main brand
+        //y: brandingY + 25, // Position below main brand
+        y: madeinY, // Position below main brand
         'text-anchor': 'middle',
         'dominant-baseline': 'middle',
-        'font-size': '14',
-        fill: '#333333', // Dark gray color
+        //'font-size': '14',
+        'font-size': '16',
+        'font-weight': 'bold',
+        //fill: '#333333', // Dark gray color
+        fill: '#000000', // Black color, change as needed
         class: 'brand-subtext'
     });
     madeInText.textContent = 'Made in Malaysia';
@@ -942,7 +952,7 @@ function initializeClock(svg, settings) {
   drawBackgroundCircleHour12();
   drawDiameterLines();
   drawNighttimeBackground();  // Draw nighttime background before circles
-  drawSurahTranslation();
+  //drawSurahTranslation();
   drawTimeCircles();
   drawTicks();
   drawCompassDirections();
